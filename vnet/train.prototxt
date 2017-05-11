@@ -1,0 +1,648 @@
+input: "data"
+input_shape { dim: 8 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+input: "label"
+input_shape { dim: 8 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+# Input block
+
+layer {
+  name: "conv_i64c16o64_input"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv_i64c16o64_input"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 16
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+# Create 16 channel data for residual function
+
+layer {
+  name: "split_input"
+  type: "Split"
+  bottom: "data"
+  top: "split_input_1"
+  top: "split_input_2"
+  top: "split_input_3"
+  top: "split_input_4"
+  top: "split_input_5"
+  top: "split_input_6"
+  top: "split_input_7"
+  top: "split_input_8"
+  top: "split_input_9"
+  top: "split_input_10"
+  top: "split_input_11"
+  top: "split_input_12"
+  top: "split_input_13"
+  top: "split_input_14"
+  top: "split_input_15"
+  top: "split_input_16"
+}
+
+# Concat into channel
+
+layer {
+  name: "concat_input"
+  type: "Concat"
+  bottom: "split_input_1"
+  bottom: "split_input_2"
+  bottom: "split_input_3"
+  bottom: "split_input_4"
+  bottom: "split_input_5"
+  bottom: "split_input_6"
+  bottom: "split_input_7"
+  bottom: "split_input_8"
+  bottom: "split_input_9"
+  bottom: "split_input_10"
+  bottom: "split_input_11"
+  bottom: "split_input_12"
+  bottom: "split_input_13"
+  bottom: "split_input_14"
+  bottom: "split_input_15"
+  bottom: "split_input_16"
+  top: "concat_input"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "add_input"
+  type: "Eltwise"
+  bottom: "conv_i64c16o64_input"
+  bottom: "concat_input"
+  top: "add_input"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_input"
+  type: "PReLU"
+  bottom: "add_input"
+  top: "relu_input"
+}
+
+layer {
+  name: "conv_pooling_i64c32o32_input"
+  type: "Convolution"
+  bottom: "relu_input"
+  top: "conv_pooling_i64c32o32_input"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 32
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_pooling_i64c32o32_input"
+  type: "PReLU"
+  bottom: "conv_pooling_i64c32o32_input"
+  top: "relu_pooling_i64c32o32_input"
+}
+
+# left block 1 - 2 stage conv
+
+layer {
+  name: "conv_i32c32o32_left1_1"
+  type: "Convolution"
+  bottom: "relu_pooling_i64c32o32_input"
+  top: "conv_i32c32o32_left1_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i32c32o32_left1_1"
+  type: "PReLU"
+  bottom: "conv_i32c32o32_left1_1"
+  top: "relu_i32c32o32_left1_1"
+}
+
+layer {
+  name: "conv_i32c32o32_left1_2"
+  type: "Convolution"
+  bottom: "relu_i32c32o32_left1_1"
+  top: "conv_i32c32o32_left1_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_left_1"
+  type: "Eltwise"
+  bottom: "conv_i32c32o32_left1_2"
+  bottom: "relu_pooling_i64c32o32_input"
+  top: "add_left_1"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i32c32o32_left1_2"
+  type: "PReLU"
+  bottom: "add_left_1"
+  top: "relu_i32c32o32_left1_2"
+}
+
+layer {
+  name: "conv_pooling_i32c64o16_left1"
+  type: "Convolution"
+  bottom: "relu_i32c32o32_left1_2"
+  top: "conv_pooling_i32c64o16_left1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_pooling_i32c64o16_left1"
+  type: "PReLU"
+  bottom: "conv_pooling_i32c64o16_left1"
+  top: "relu_pooling_i32c64o16_left1"
+}
+
+# left block 2 - 3 stage conv
+
+layer {
+  name: "conv_i16c64o16_left2_1"
+  type: "Convolution"
+  bottom: "relu_pooling_i32c64o16_left1"
+  top: "conv_i16c64o16_left2_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c64o16_left2_1"
+  type: "PReLU"
+  bottom: "conv_i16c64o16_left2_1"
+  top: "relu_i16c64o16_left2_1"
+}
+
+layer {
+  name: "conv_i16c64o16_left2_2"
+  type: "Convolution"
+  bottom: "relu_i16c64o16_left2_1"
+  top: "conv_i16c64o16_left2_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c64o16_left2_2"
+  type: "PReLU"
+  bottom: "conv_i16c64o16_left2_2"
+  top: "relu_i16c64o16_left2_2"
+}
+
+layer {
+  name: "conv_i16c64o16_left2_3"
+  type: "Convolution"
+  bottom: "relu_i16c64o16_left2_2"
+  top: "conv_i16c64o16_left2_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_left_2"
+  type: "Eltwise"
+  bottom: "conv_i16c64o16_left2_3"
+  bottom: "relu_pooling_i32c64o16_left1"
+  top: "add_left_2"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i16c64o16_left2_3"
+  type: "PReLU"
+  bottom: "add_left_2"
+  top: "relu_i16c64o16_left2_3"
+}
+
+layer {
+  name: "conv_pooling_i16c128o8_left2"
+  type: "Convolution"
+  bottom: "relu_i16c64o16_left2_3"
+  top: "conv_pooling_i16c128o8_left2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_pooling_i16c128o8_left2"
+  type: "PReLU"
+  bottom: "conv_pooling_i16c128o8_left2"
+  top: "relu_pooling_i16c128o8_left2"
+}
+
+# left block 3 - 3 stage conv
+
+layer {
+  name: "conv_i8c128o8_left3_1"
+  type: "Convolution"
+  bottom: "relu_pooling_i16c128o8_left2"
+  top: "conv_i8c128o8_left3_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i8c128o8_left3_1"
+  type: "PReLU"
+  bottom: "conv_i8c128o8_left3_1"
+  top: "relu_i8c128o8_left3_1"
+}
+
+layer {
+  name: "conv_i8c128o8_left3_2"
+  type: "Convolution"
+  bottom: "relu_i8c128o8_left3_1"
+  top: "conv_i8c128o8_left3_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i8c128o8_left3_2"
+  type: "PReLU"
+  bottom: "conv_i8c128o8_left3_2"
+  top: "relu_i8c128o8_left3_2"
+}
+
+layer {
+  name: "conv_i8c128o8_left3_3"
+  type: "Convolution"
+  bottom: "relu_i8c128o8_left3_2"
+  top: "conv_i8c128o8_left3_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_left_3"
+  type: "Eltwise"
+  bottom: "conv_i8c128o8_left3_3"
+  bottom: "relu_pooling_i16c128o8_left2"
+  top: "add_left_3"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i8c128o8_left3_3"
+  type: "PReLU"
+  bottom: "add_left_3"
+  top: "relu_i8c128o8_left3_3"
+}
+
+layer {
+  name: "depooling_i8c64o16_left3"
+  type: "Deconvolution"
+  bottom: "relu_i8c128o8_left3_3"
+  top: "depooling_i8c64o16_left3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i8c64o16_left3"
+  type: "PReLU"
+  bottom: "depooling_i8c64o16_left3"
+  top: "relu_i8c64o16_left3"
+}
+
+# Right block 1 - 3 stage conv
+
+layer {
+  name: "concat_right1"
+  type: "Concat"
+  bottom: "relu_i8c64o16_left3"
+  bottom: "add_left_2"
+  top: "concat_right1"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "conv_i16c128o16_right1_1"
+  type: "Convolution"
+  bottom: "conv_i8c128o8_left3_3"
+  top: "conv_i16c128o16_right1_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_1"
+  type: "PReLU"
+  bottom: "conv_i16c128o16_right1_1"
+  top: "relu_i16c128o16_right1_1"
+}
+
+layer {
+  name: "conv_i16c128o16_right1_2"
+  type: "Convolution"
+  bottom: "relu_i16c128o16_right1_1"
+  top: "conv_i16c128o16_right1_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_2"
+  type: "PReLU"
+  bottom: "conv_i16c128o16_right1_2"
+  top: "relu_i16c128o16_right1_2"
+}
+
+layer {
+  name: "conv_i16c128o16_right1_3"
+  type: "Convolution"
+  bottom: "relu_i16c128o16_right1_2"
+  top: "conv_i16c128o16_right1_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_right_1"
+  type: "Eltwise"
+  bottom: "conv_i16c128o16_right1_3"
+  bottom: "concat_right1"
+  top: "add_right_1"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_3"
+  type: "PReLU"
+  bottom: "add_right_1"
+  top: "relu_i16c128o16_right1_3"
+}
+
+layer {
+  name: "depooling_i16c64o32_right1"
+  type: "Deconvolution"
+  bottom: "relu_i16c128o16_right1_3"
+  top: "depooling_i16c64o32_right1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c64o32_right1"
+  type: "PReLU"
+  bottom: "depooling_i16c64o32_right1"
+  top: "relu_i16c64o32_right1"
+}
+
+# Right block 2 - 2 stage conv
+
+layer {
+  name: "concat_right2"
+  type: "Concat"
+  bottom: "relu_i16c64o32_right1"
+  bottom: "add_left_1"
+  top: "concat_right2"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "conv_i32c128o32_right2_1"
+  type: "Convolution"
+  bottom: "concat_right2"
+  top: "conv_i64c128o64_right2_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_1"
+  type: "PReLU"
+  bottom: "conv_i16c128o16_right1_1"
+  top: "relu_i16c128o16_right1_1"
+}
+
+layer {
+  name: "conv_i16c128o16_right1_2"
+  type: "Convolution"
+  bottom: "relu_i16c128o16_right1_1"
+  top: "conv_i16c128o16_right1_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_2"
+  type: "PReLU"
+  bottom: "conv_i16c128o16_right1_2"
+  top: "relu_i16c128o16_right1_2"
+}
+
+layer {
+  name: "conv_i16c128o16_right1_3"
+  type: "Convolution"
+  bottom: "relu_i16c128o16_right1_2"
+  top: "conv_i16c128o16_right1_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_right_1"
+  type: "Eltwise"
+  bottom: "conv_i16c128o16_right1_3"
+  bottom: "concat_right1"
+  top: "add_right_1"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i16c128o16_right1_3"
+  type: "PReLU"
+  bottom: "add_right_1"
+  top: "relu_i16c128o16_right1_3"
+}
+
+layer {
+  name: "depooling_i16c64o32_right1"
+  type: "Deconvolution"
+  bottom: "relu_i16c128o16_right1_3"
+  top: "depooling_i16c64o32_right1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i16c64o32_right1"
+  type: "PReLU"
+  bottom: "depooling_i16c64o32_right1"
+  top: "relu_i16c64o32_right1"
+}
+
+
+# Right block 3 - 2 stage conv
+
+# Output block
+

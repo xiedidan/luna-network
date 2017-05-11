@@ -502,14 +502,14 @@ layer {
 }
 
 layer {
-  name: "depooling_i16c64o32_right1"
+  name: "depooling_i16c32o32_right1"
   type: "Deconvolution"
   bottom: "relu_i16c128o16_right1_3"
-  top: "depooling_i16c64o32_right1"
+  top: "depooling_i16c32o32_right1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
-    num_output: 64
+    num_output: 32
     kernel_size: 2
     pad: 0
     stride: 2
@@ -519,10 +519,10 @@ layer {
 }
 
 layer {
-  name: "relu_i16c64o32_right1"
+  name: "relu_i16c32o32_right1"
   type: "PReLU"
-  bottom: "depooling_i16c64o32_right1"
-  top: "relu_i16c64o32_right1"
+  bottom: "depooling_i16c32o32_right1"
+  top: "relu_i16c32o32_right1"
 }
 
 # Right block 2 - 2 stage conv
@@ -530,102 +530,78 @@ layer {
 layer {
   name: "concat_right2"
   type: "Concat"
-  bottom: "relu_i16c64o32_right1"
+  bottom: "relu_i16c32o32_right1"
   bottom: "add_left_1"
   top: "concat_right2"
   concat_param { axis: 1 }
 }
 
 layer {
-  name: "conv_i32c128o32_right2_1"
+  name: "conv_i32c64o32_right2_1"
   type: "Convolution"
   bottom: "concat_right2"
-  top: "conv_i64c128o64_right2_1"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    num_output: 128
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "relu_i16c128o16_right1_1"
-  type: "PReLU"
-  bottom: "conv_i16c128o16_right1_1"
-  top: "relu_i16c128o16_right1_1"
-}
-
-layer {
-  name: "conv_i16c128o16_right1_2"
-  type: "Convolution"
-  bottom: "relu_i16c128o16_right1_1"
-  top: "conv_i16c128o16_right1_2"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    num_output: 128
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "relu_i16c128o16_right1_2"
-  type: "PReLU"
-  bottom: "conv_i16c128o16_right1_2"
-  top: "relu_i16c128o16_right1_2"
-}
-
-layer {
-  name: "conv_i16c128o16_right1_3"
-  type: "Convolution"
-  bottom: "relu_i16c128o16_right1_2"
-  top: "conv_i16c128o16_right1_3"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    num_output: 128
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "add_right_1"
-  type: "Eltwise"
-  bottom: "conv_i16c128o16_right1_3"
-  bottom: "concat_right1"
-  top: "add_right_1"
-  eltwise_param { operation: SUM }
-}
-
-layer {
-  name: "relu_i16c128o16_right1_3"
-  type: "PReLU"
-  bottom: "add_right_1"
-  top: "relu_i16c128o16_right1_3"
-}
-
-layer {
-  name: "depooling_i16c64o32_right1"
-  type: "Deconvolution"
-  bottom: "relu_i16c128o16_right1_3"
-  top: "depooling_i16c64o32_right1"
+  top: "conv_i32c64o32_right2_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i32c64o32_right2_1"
+  type: "PReLU"
+  bottom: "conv_i32c64o32_right2_1"
+  top: "relu_i32c64o32_right2_1"
+}
+
+layer {
+  name: "relu_i32c64o32_right2_2"
+  type: "Convolution"
+  bottom: "relu_i32c64o32_right2_1"
+  top: "relu_i32c64o32_right2_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_right_2"
+  type: "Eltwise"
+  bottom: "relu_i32c64o32_right2_2"
+  bottom: "concat_right2"
+  top: "add_right_2"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_i32c64o32_right2_2"
+  type: "PReLU"
+  bottom: "add_right_2"
+  top: "relu_i32c64o32_right2_2"
+}
+
+layer {
+  name: "depooling_i32c16o64_right2"
+  type: "Deconvolution"
+  bottom: "relu_i32c64o64_right2_2"
+  top: "depooling_i32c16o64_right2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 16
     kernel_size: 2
     pad: 0
     stride: 2
@@ -635,14 +611,82 @@ layer {
 }
 
 layer {
-  name: "relu_i16c64o32_right1"
+  name: "relu_i32c16o64_right2"
   type: "PReLU"
-  bottom: "depooling_i16c64o32_right1"
-  top: "relu_i16c64o32_right1"
+  bottom: "depooling_i32c16o64_right2"
+  top: "relu_i32c16o64_right2"
 }
-
-
-# Right block 3 - 2 stage conv
 
 # Output block
 
+layer {
+  name: "concat_output"
+  type: "Concat"
+  bottom: "relu_i32c16o64_right2"
+  bottom: "add_input"
+  top: "concat_output"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "conv_i64c32o64_output_1"
+  type: "Convolution"
+  bottom: "concat_output"
+  top: "conv_i64c32o64_output_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c32o64_output_1"
+  type: "PReLU"
+  bottom: "conv_i64c32o64_output_1"
+  top: "relu_i64c32o64_output_1"
+}
+
+layer {
+  name: "add_output"
+  type: "Eltwise"
+  bottom: "relu_i64c32o64_output_1"
+  bottom: "concat_output"
+  top: "add_output"
+  eltwise_param { operation: SUM }
+}
+
+# TODO : do we need relu here?
+
+# 1*1*1 conv
+
+layer {
+  name: "conv_i64c2o64_output_1"
+  type: "Convolution"
+  bottom: "add_output"
+  top: "conv_i64c2o64_output_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    num_output: 2
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c2o64_output_1"
+  type: "PReLU"
+  bottom: "conv_i64c2o64_output_1"
+  top: "relu_i64c2o64_output_1"
+}
+
+# TODO : softmax or dice?

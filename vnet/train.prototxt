@@ -423,7 +423,7 @@ layer {
 layer {
   name: "conv_i16c128o16_right1_1"
   type: "Convolution"
-  bottom: "conv_i8c128o8_left3_3"
+  bottom: "concat_right1"
   top: "conv_i16c128o16_right1_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -561,10 +561,10 @@ layer {
 }
 
 layer {
-  name: "relu_i32c64o32_right2_2"
+  name: "conv_i32c64o32_right2_2"
   type: "Convolution"
   bottom: "relu_i32c64o32_right2_1"
-  top: "relu_i32c64o32_right2_2"
+  top: "conv_i32c64o32_right2_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -580,7 +580,7 @@ layer {
 layer {
   name: "add_right_2"
   type: "Eltwise"
-  bottom: "relu_i32c64o32_right2_2"
+  bottom: "conv_i32c64o32_right2_2"
   bottom: "concat_right2"
   top: "add_right_2"
   eltwise_param { operation: SUM }
@@ -596,7 +596,7 @@ layer {
 layer {
   name: "depooling_i32c16o64_right2"
   type: "Deconvolution"
-  bottom: "relu_i32c64o64_right2_2"
+  bottom: "relu_i32c64o32_right2_2"
   top: "depooling_i32c16o64_right2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }

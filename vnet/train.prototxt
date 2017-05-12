@@ -661,7 +661,12 @@ layer {
   eltwise_param { operation: SUM }
 }
 
-# TODO : do we need relu here?
+layer {
+  name: "relu_i64c32o64_output_1"
+  type: "PReLU"
+  bottom: "conv_i64c32o64_output_1"
+  top: "relu_i64c32o64_output_1"
+}
 
 # 1*1*1 conv
 
@@ -683,10 +688,17 @@ layer {
 }
 
 layer {
-  name: "relu_i64c2o64_output_1"
-  type: "PReLU"
+  name: "softmax"
+  type: "Softmax"
   bottom: "conv_i64c2o64_output_1"
-  top: "relu_i64c2o64_output_1"
+  top: "softmax"
 }
 
-# TODO : softmax or dice?
+layer {
+  name: "dice_loss"
+  type: "Python"
+  bottom: "softmax"
+  bottom: "label"
+  python_param { module: "diceLossLayer" layer: "DiceLoss" }
+  loss_weight: 1
+}

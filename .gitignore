@@ -89,5 +89,8 @@ ENV/
 .ropeproject
 
 # IDE files
+.idea
 vnet/.idea
 
+# network outputs
+vnet/snapshot

@@ -23,7 +23,7 @@ import matplotlib
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 2, queueSize = 30, volSize = 64):
+    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 4, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.iterationCount = iterationCount
         self.batchSize = batchSize
@@ -90,6 +90,18 @@ class Train(object):
         # load all samples
         samples = self.loadAllSamples("npy/", npyFileList)
 
+        for sample in samples:
+            image = sample["image"]
+
+            mean = np.mean(image)
+            std = np.std(image)
+            print("mean: {0}, std: {1}".format(mean, std))
+
+            image = image.astype(np.float32)
+            image -= mean.astype(np.float32)
+            image /= std.astype(np.float32)
+            sample["image"] = image
+
         # crop on the fly since we want randomized input
         np.random.seed()
         for i in range(self.iterationCount):
@@ -99,7 +111,7 @@ class Train(object):
                 sample = samples[noduleIndex]
 
                 # randomized cropping
-                sample = self.randomizedCrop(sample, 0.3, 0.3)
+                sample = self.randomizedCrop(sample, 0.0, 0.0)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
                 # print(dataQueue.qsize())
@@ -109,6 +121,7 @@ class Train(object):
         batchLabel = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
 
         trainLoss = np.zeros(self.iterationCount)
+        plt.ion()
 
         for i in range(self.iterationCount):
             for j in range(self.batchSize):
@@ -129,7 +142,7 @@ class Train(object):
                 plt.plot(range(0, i), trainLoss[0:i])
                 plt.pause(0.00000001)
 
-            # matplotlib.pyplot.show()
+            matplotlib.pyplot.show()
 
     # interface
     def train(self):

@@ -1,8 +1,8 @@
 input: "data"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 # Input block
 
@@ -739,11 +739,19 @@ layer {
 }
 
 layer {
+  type: "DiceLoss"
   name: "dice_loss"
-  type: "Python"
+  top: "dice_loss"
   bottom: "softmax"
   bottom: "label_flat"
-  top: "loss"
-  python_param { module: "diceLossLayer" layer: "DiceLoss" }
-  loss_weight: 1
 }
+
+#layer {
+#  name: "dice_loss"
+#  type: "Python"
+#  bottom: "softmax"
+#  bottom: "label_flat"
+#  top: "dice_loss"
+#  python_param { module: "diceLossLayer" layer: "DiceLoss" }
+#  loss_weight: 1
+#}

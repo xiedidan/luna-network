@@ -33,6 +33,8 @@ class DiceLoss(caffe.Layer):
         self.union = np.zeros(bottom[0].data.shape[0],dtype=np.float32)
         self.intersection = np.zeros(bottom[0].data.shape[0],dtype=np.float32)
 
+        print(np.argmax(bottom[0].data[...],axis=1))
+
         self.result = np.reshape(np.squeeze(np.argmax(bottom[0].data[...],axis=1)),[bottom[0].data.shape[0],bottom[0].data.shape[2]])
         self.gt = np.reshape(np.squeeze(bottom[1].data[...]),[bottom[1].data.shape[0],bottom[1].data.shape[2]])
 
@@ -48,9 +50,10 @@ class DiceLoss(caffe.Layer):
             self.intersection[i]=(np.sum(CurrResult * CurrGT))
 
             dice[i] = 2 * self.intersection[i] / (self.union[i]+0.00001)
-            print(dice[i])
+            # print(dice[i])
 
         top[0].data[0]=np.sum(dice)
+        # print(top[0].data[0])
 
     def backward(self, top, propagate_down, bottom):
         for btm in [0]:

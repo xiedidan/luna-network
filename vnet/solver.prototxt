@@ -1,10 +1,10 @@
 net: "./train.prototxt"
 snapshot_prefix: "./snapshot/"
-base_lr: 0.000001
-momentum: 0.99
+base_lr: 0.0002
+momentum: 0.9
 weight_decay: 0.0005
 lr_policy: "step"
-stepsize: 20000
-gamma: 0.1
+stepsize: 2000
+gamma: 0.7
 display: 1
 snapshot: 500

@@ -23,7 +23,7 @@ import matplotlib
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 2, queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 4, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.iterationCount = iterationCount
         self.batchSize = batchSize
@@ -107,12 +107,12 @@ class Train(object):
         for i in range(self.iterationCount):
             for j in range(self.batchSize):
                 # get random sample
-                #noduleIndex = np.random.randint(0, len(samples) - 1)
-                #sample = samples[noduleIndex]
-                sample = samples[0]
+                noduleIndex = np.random.randint(0, len(samples) - 1)
+                sample = samples[noduleIndex]
+                #sample = samples[0]
 
                 # randomized cropping
-                sample = self.randomizedCrop(sample, 0, 0)
+                sample = self.randomizedCrop(sample, 0.3, 0.3)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
                 # print(dataQueue.qsize())
@@ -165,5 +165,5 @@ class Train(object):
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/test1/")
+    trainer = Train("d:/project/tianchi/data/")
     trainer.train()

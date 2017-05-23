@@ -20,7 +20,7 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 import matplotlib
 
-class Test(obj):
+class Test(object):
     # constructor
     def __init__(self, dataPath="./", volSize=64):
         self.dataPath = dataPath
@@ -31,8 +31,9 @@ class Test(obj):
         serializer = NoduleSerializer.NoduleSerializer(self.dataPath)
 
         sample = {}
-        image = serializer.readFromNpy(subPath + "nodules/", filename)
+        image = serializer.readFromNpy(subPath + "npy/", filename)
         sample["image"] = image
+        sample["filename"] = os.path.basename(filename)
 
         return sample
 
@@ -45,7 +46,25 @@ class Test(obj):
 
     # interface
     def test(self):
-        self.loadAllSamples("test/")
+        samples = self.loadAllSamples("test/")
+
+        caffe.set_device(0)
+        caffe.set_mode_gpu()
+
+        net =caffe.Net("test.prototxt", os.path.join("./snapshot/", "_iter_37000.caffemodel"), caffe.TEST)
+        results = dict()
+
+        serializer = NoduleSerializer(self.dataPath + "test/")
+
+        for i in range(len(samples)):
+            sample = samples[i]
+            net.blobs['data'].data[0, 0, :, :, :] = sample["image"]
+
+            out = net.forward()
+            labels = out["reshape_label"]
+            labelMap = np.squeeze(np.argmax(labels, axis = 1))
+
+            serializer.writeToNpy("results/", sample["filename"], labelMap)
 
 if __name__ == "__main__":
     tester = Test("d:/project/tianchi/data/")

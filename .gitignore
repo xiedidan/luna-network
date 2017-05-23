@@ -94,3 +94,5 @@ vnet/.idea
 
 # network outputs
 vnet/snapshot
+resnext/snapshot
+resnext/.idea

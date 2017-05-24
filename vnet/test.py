@@ -61,10 +61,15 @@ class Test(object):
             net.blobs['data'].data[0, 0, :, :, :] = sample["image"]
 
             out = net.forward()
-            labels = out["reshape_label"]
-            labelMap = np.squeeze(np.argmax(labels, axis = 1))
 
-            serializer.writeToNpy("results/", sample["filename"], labelMap)
+            labels = out["reshape_label"]
+
+            # export as vnet output
+            labelMap = np.squeeze(np.argmax(labels, axis = 1))
+            serializer.writeToNpy("labels/", sample["filename"], labelMap)
+
+            # export for resnext
+            serializer.writeToNpy("results/", sample["filename"], labels)
 
 if __name__ == "__main__":
     tester = Test("d:/project/tianchi/data/")

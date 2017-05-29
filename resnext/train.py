@@ -23,7 +23,7 @@ import matplotlib
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 4, queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 1, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.iterationCount = iterationCount
         self.batchSize = batchSize
@@ -137,7 +137,7 @@ class Train(object):
 
             solver.step(1)
 
-            trainLoss[i] = solver.net.blobs["dice_loss"].data
+            trainLoss[i] = solver.net.blobs["loss"].data
             if np.mod(i, 30) == 0:
                 plt.clf()
                 plt.plot(range(0, i), trainLoss[0:i])
@@ -159,7 +159,7 @@ class Train(object):
 
         caffe.set_device(0)
         caffe.set_mode_gpu()
-        solver = caffe.SGDSolver("solver.prototxt")
+        solver = caffe.SGDSolver("resnext.test.prototxt")
 
         # start trainProcessor in main process
         self.trainProcessor(dataQueue, solver)

@@ -1,0 +1,289 @@
+# Enter your network definition here.
+# Use Shift+Enter to update the visualization.
+input: "data"
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+input: "label"
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+# Input block
+
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 64
+    bias_term: false
+    pad: 3
+    kernel_size: 7
+    stride: 2
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "conv1_bn"
+  type: "BatchNorm"
+  bottom: "conv1"
+  top: "conv1"
+  batch_norm_param {
+    use_global_stats: false
+  }
+}
+layer {
+  name: "conv1_scale"
+  type: "Scale"
+  bottom: "conv1"
+  top: "conv1"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "conv1_relu"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+layer {
+  name: "resx1_conv1"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "resx1_conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "resx1_conv1_bn"
+  type: "BatchNorm"
+  bottom: "resx1_conv1"
+  top: "resx1_conv1"
+  batch_norm_param {
+    use_global_stats: false
+  }
+}
+layer {
+  name: "resx1_conv1_scale"
+  type: "Scale"
+  bottom: "resx1_conv1"
+  top: "resx1_conv1"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "resx1_conv1_relu"
+  type: "ReLU"
+  bottom: "resx1_conv1"
+  top: "resx1_conv1"
+}
+layer {
+  name: "resx1_conv2"
+  type: "Convolution"
+  bottom: "resx1_conv1"
+  top: "resx1_conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 32
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "resx1_conv2_bn"
+  type: "BatchNorm"
+  bottom: "resx1_conv2"
+  top: "resx1_conv2"
+  batch_norm_param {
+    use_global_stats: false
+  }
+}
+layer {
+  name: "resx1_conv2_scale"
+  type: "Scale"
+  bottom: "resx1_conv2"
+  top: "resx1_conv2"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "resx1_conv2_relu"
+  type: "ReLU"
+  bottom: "resx1_conv2"
+  top: "resx1_conv2"
+}
+layer {
+  name: "resx1_conv3"
+  type: "Convolution"
+  bottom: "resx1_conv2"
+  top: "resx1_conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "resx1_conv3_bn"
+  type: "BatchNorm"
+  bottom: "resx1_conv3"
+  top: "resx1_conv3"
+  batch_norm_param {
+    use_global_stats: false
+  }
+}
+layer {
+  name: "resx1_conv3_scale"
+  type: "Scale"
+  bottom: "resx1_conv3"
+  top: "resx1_conv3"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "resx1_match_conv"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "resx1_match_conv"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "resx1_match_conv_bn"
+  type: "BatchNorm"
+  bottom: "resx1_match_conv"
+  top: "resx1_match_conv"
+  batch_norm_param {
+    use_global_stats: false
+  }
+}
+layer {
+  name: "resx1_match_conv_scale"
+  type: "Scale"
+  bottom: "resx1_match_conv"
+  top: "resx1_match_conv"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "resx1_elewise"
+  type: "Eltwise"
+  bottom: "resx1_match_conv"
+  bottom: "resx1_conv3"
+  top: "resx1_elewise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+layer {
+  name: "resx1_elewise_relu"
+  type: "ReLU"
+  bottom: "resx1_elewise"
+  top: "resx1_elewise"
+}
+layer {
+  name: "pool_ave"
+  type: "Pooling"
+  bottom: "resx1_elewise"
+  top: "pool_ave"
+  pooling_param {
+    pool: AVE
+    global_pooling: true
+  }
+}
+layer {
+  name: "classifier"
+  type: "InnerProduct"
+  bottom: "pool_ave"
+  top: "classifier"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "classifier"
+  bottom: "label"
+  top: "loss"
+}

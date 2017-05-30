@@ -1,13 +1,12 @@
 # Enter your network definition here.
 # Use Shift+Enter to update the visualization.
 input: "data"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 2 dim: 1 dim: 1 }
 
 # Input block
-
 
 layer {
   name: "conv1"

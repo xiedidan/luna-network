@@ -23,7 +23,7 @@ import matplotlib
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 1, queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 2, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.phraseSubPath = "train/"
         self.iterationCount = iterationCount
@@ -52,7 +52,7 @@ class Train(object):
 
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
-        # groundTruth = sample["groundTruth"]
+        groundTruth = sample["groundTruth"]
 
         if np.random.random() < rotateRatio:
             # rotate - p(3, 3) - 1 possibles
@@ -83,6 +83,7 @@ class Train(object):
         crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
         # resnext doesn't need to shift label
         # crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
+        crop["groundTruth"] = groundTruth
         return crop
 
     def dataProcessor(self, dataQueue):
@@ -121,7 +122,7 @@ class Train(object):
 
     def trainProcessor(self, dataQueue, solver):
         batchData = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
-        batchLabel = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
+        batchLabel = np.zeros((self.batchSize, 1, 1))
 
         trainLoss = np.zeros(self.iterationCount)
         plt.ion()
@@ -132,7 +133,8 @@ class Train(object):
                 [nodule, groundTruth] = dataQueue.get()
 
                 batchData[j, 0, :, :, :] = nodule.astype(dtype = np.float32)
-                batchLabel[j, 0, :, :, :] = groundTruth.astype(dtype = np.float32)
+                groundTruth = np.array([groundTruth])
+                batchLabel[j, 0, :] = groundTruth.astype(dtype = np.float32)
 
             solver.net.blobs["data"].data[...] = batchData.astype(dtype = np.float32)
             solver.net.blobs["label"].data[...] = batchLabel.astype(dtype = np.float32)
@@ -161,11 +163,11 @@ class Train(object):
 
         caffe.set_device(0)
         caffe.set_mode_gpu()
-        solver = caffe.SGDSolver("resnext.test.prototxt")
+        solver = caffe.SGDSolver("solver.prototxt")
 
         # start trainProcessor in main process
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/experiment/")
+    trainer = Train("c:/project/tianchi/data/experiment/")
     trainer.train()

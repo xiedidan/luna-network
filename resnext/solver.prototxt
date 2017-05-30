@@ -1,4 +1,4 @@
-net: "./train.prototxt"
+net: "./minimal.train.prototxt"
 snapshot_prefix: "./snapshot/"
 base_lr: 0.1
 momentum: 0.9
@@ -8,4 +8,3 @@ stepsize: 2000
 gamma: 0.7
 display: 1
 snapshot: 500
-

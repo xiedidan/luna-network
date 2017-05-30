@@ -91,8 +91,8 @@ ENV/
 # IDE files
 .idea
 vnet/.idea
+resnext/.idea
 
 # network outputs
 vnet/snapshot
 resnext/snapshot
-resnext/.idea

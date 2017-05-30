@@ -4,7 +4,7 @@ input: "data"
 input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 2 dim: 1 dim: 1 }
+input_shape { dim: 2 dim: 2 }
 
 # Input block
 
@@ -269,7 +269,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 1
+    num_output: 2
     weight_filler {
       type: "xavier"
     }
@@ -279,10 +279,39 @@ layer {
     }
   }
 }
+
+layer {
+    name: "reshape"
+    type: "Reshape"
+    bottom: "classifier"
+    top: "classifier_reshape"
+    reshape_param {
+      shape {
+        dim: 0  # copy the dimension from below
+        dim: 1
+        dim: 2
+        dim: -1
+      }
+    }
+  }
+
+layer {
+  name: "softmax"
+  type: "Softmax"
+  bottom: "classifier_reshape"
+  top: "prob"
+  softmax_param{
+    axis: 1
+  }
+}
+
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "classifier"
+  bottom: "classifier_reshape"
   bottom: "label"
   top: "loss"
+  softmax_param{
+    axis: 1
+  }
 }

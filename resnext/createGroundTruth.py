@@ -25,9 +25,11 @@ class GroundTruthCreator(object):
         noduleFileList = glob(self.dataPath + self.phraseSubPath + "nodules/*.npy")
         print(noduleFileList)
         for noduleFile in noduleFileList:
-            label = 0
+            label = np.array([0, 0])
             if np.random.random() > 0.5:
-                label = 1
+                label[0] = 1
+            else:
+                label[1] = 1
             
             filename = os.path.basename(noduleFile)
             groundTruthFile = groundTruthPath + filename

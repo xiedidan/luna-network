@@ -2,12 +2,14 @@
 
 import sys
 sys.path.append("../luna-data-pre-processing")
+
 import os
 import numpy as np
 from glob import glob
 
 import NoduleCropper
 import NoduleSerializer
+from scan import Scanner
 
 import caffe
 import multiprocessing
@@ -22,108 +24,41 @@ import matplotlib
 
 class Test(object):
     # constructor
-    def __init__(self, dataPath="./", volSize=64):
+    def __init__(self, dataPath = "./", snapshot = "_iter_3700.caffemodel", queueSize = 32, volSize = 64):
         self.dataPath = dataPath
+        self.snapshot = snapshot
+        self.queueSize = queueSize
         self.volSize = volSize
+        self.serializer = NoduleSerializer(self.dataPath)
 
     # helper
-    def randomizedCrop(self, sample, rotateRatio, shiftRatio):
-        image = sample["image"]
+    def dataScanner(self, dataPath, dataQueue):
+        scanner = Scanner(dataPath, dataQueue)
+        scanner.scanAllFiles()
 
-        if np.random.random() < rotateRatio:
-            # rotate - p(3, 3) - 1 possibles
-            rotateList = [[1, 0, 2],
-                          [1, 2, 0],
-                          [2, 0, 1],
-                          [2, 1, 0],
-                          [0, 2, 1]]
-            dir = np.random.randint(0, 4)
-            rotate = rotateList[dir]
-            image = np.transpose(image, rotate)
+    def testProcess(self, dataQueue, net, serializer):
+        while (True):
+            crop = dataQueue.get()
+            net.blobs['data'].data[0, 0, :, :, :] = crop["image"].astype(dtype = np.float32)
 
-        centerRange = [32, 96]
-        if np.random.random() < shiftRatio:
-            # shift - we shift +-8 max along each axis
-            shiftx = np.random.randint(-8, 8)
-            shifty = np.random.randint(-8, 8)
-            shiftz = np.random.randint(-8, 8)
-            xRange = centerRange + [shiftx, shiftx]
-            yRange = centerRange + [shifty, shifty]
-            zRange = centerRange + [shiftz, shiftz]
-        else:
-            xRange = centerRange
-            yRange = centerRange
-            zRange = centerRange
+            out = net.forware()
 
-        crop = {}
-        crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
-        return crop
-
-    def normalizeSample(self, sample):
-        image = sample["image"]
-        mean = np.mean(image)
-        std = np.std(image)
-        print("sample: {0}, mean: {1}, std: {2}".format(sample["filename"], mean, std))
-
-        image = image.astype(np.float32)
-        image -= mean.astype(np.float32)
-        image /= std.astype(np.float32)
-        sample["image"] = image
-
-    def normalizeAllSamples(self, samples):
-        for sample in samples:
-            self.normalizeSample(sample)
-
-    def loadSample(self, subPath, filename):
-        serializer = NoduleSerializer.NoduleSerializer(self.dataPath)
-
-        sample = {}
-        image = serializer.readFromNpy(subPath + "nodules/", filename)
-        sample["image"] = image
-        sample["filename"] = os.path.basename(filename)
-
-        return sample
-
-    def loadAllSamples(self, subPath, filenames):
-        samples = []
-        for filename in filenames:
-            sample = self.loadSample(subPath, filename)
-            samples.append(sample)
-        return samples
+            labels = out["reshape_label"]
+            serializer.writeToNpy("results/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), np.squeeze(labels.astype(np.float32)))
+            serializer.writeToNpy("steps/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), crop["steps"])
 
     # interface
     def test(self):
-        # TODO : load all test samples
-        sampleFileList = glob(self.dataPath + "npy/nodules/*.npy")
-        sampleFileList = map(lambda filePath: os.path.basename(filePath), sampleFileList)
-
-        samples = self.loadAllSamples("npy/", sampleFileList)
-        self.normalizeAllSamples(samples)
+        dataQueue = multiprocessing.Queue(self.queueSize)
+        scanProcess = multiprocessing.Process(target = self.dataScanner, args = (self.dataPath, dataQueue))
+        scanProcess.daemon = True
+        scanProcess.start()
 
         caffe.set_device(0)
         caffe.set_mode_gpu()
 
-        net =caffe.Net("test.prototxt", os.path.join("./snapshot/", "_iter_37000.caffemodel"), caffe.TEST)
-        results = dict()
-
-        serializer = NoduleSerializer.NoduleSerializer(self.dataPath + "test/")
-
-        for i in range(len(samples)):
-            sample = samples[i]
-            crop = self.randomizedCrop(sample, 0, 0)
-
-            net.blobs['data'].data[0, 0, :, :, :] = crop["image"]
-
-            out = net.forward()
-
-            labels = out["reshape_label"]
-
-            # export as vnet output
-            labelMap = np.squeeze(np.argmax(labels, axis = 1))
-            serializer.writeToNpy("labels/", sample["filename"], labelMap.astype(np.int8))
-
-            # export for resnext
-            serializer.writeToNpy("results/", sample["filename"], np.squeeze(labels.astype(np.float32)))
+        net =caffe.Net("test.prototxt", os.path.join("./snapshot/", self.snapshot), caffe.TEST)
+        self.testProcess(dataQueue, net, self.serializer)
 
 if __name__ == "__main__":
     tester = Test("d:/project/tianchi/data/")

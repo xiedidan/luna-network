@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
 
+import sys
+sys.path.append("../luna-data-pre-processing")
+
 import os
 from glob import glob
 import numpy as np
@@ -22,6 +25,20 @@ class Scanner(object):
         self.cropper = NoduleCropper(self.dataPath)
 
     # helper
+    def setWindow(self, image, upperBound = 400.0, lowerBound = -1000.0):
+        image[image > upperBound] = upperBound
+        image[image < lowerBound] = lowerBound
+        return image
+
+    def normalize(self, image):
+        mean = np.mean(image)
+        std = np.std(image)
+
+        image = image.astype(np.float32)
+        image -= mean.astype(np.float32)
+        image /= std.astype(np.float32)
+        return image
+
     def scanSingleFile(self, filename):
         seriesuid = os.path.basename(filename).split(".")[0]
         image = self.serializer.readFromNpy(filename)
@@ -36,12 +53,14 @@ class Scanner(object):
                     center = np.array([(z + 1) * self.stepSize, (y + 1) * self.stepSize, (x + 1) * self.stepSize])
                     crop = self.cropper.cropSingleNodule(image, center, np.array[0, 0, 0], np.array[1.0, 1.0, 1.0], self.cropSize)
 
+                    crop = self.setWindow(crop)
+                    crop = self.normalize(crop)
+
                     data = {}
                     data["number"] = z * steps[1] * steps[2] + y * steps[2] + x
+                    data["steps"] = np.array([z, y, x])
                     data["seriesuid"] = seriesuid
                     data["image"] = crop
-
-                    # TODO : normalize data
 
                     self.dataQueue.put(data)
 

@@ -3,7 +3,6 @@
 import sys
 sys.path.append("../luna-data-pre-processing")
 import os
-import numpy as np
 from glob import glob
 
 import NoduleCropper
@@ -49,6 +48,20 @@ class Train(object):
             samples.append(sample)
         return samples
 
+    def setWindow(self, image, upperBound = 400.0, lowerBound = -1000.0):
+        image[image > upperBound] = upperBound
+        image[image < lowerBound] = lowerBound
+        return image
+
+    def normalize(self, image):
+        mean = np.mean(image)
+        std = np.std(image)
+
+        image = image.astype(np.float32)
+        image -= mean.astype(np.float32)
+        image /= std.astype(np.float32)
+        return image
+
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
         groundTruth = sample["groundTruth"]
@@ -92,14 +105,8 @@ class Train(object):
 
         for sample in samples:
             image = sample["image"]
-
-            mean = np.mean(image)
-            std = np.std(image)
-            print("mean: {0}, std: {1}".format(mean, std))
-
-            image = image.astype(np.float32)
-            image -= mean.astype(np.float32)
-            image /= std.astype(np.float32)
+            image = self.setWindow(image)
+            image = self.normalize(image)
             sample["image"] = image
 
         # crop on the fly since we want randomized input

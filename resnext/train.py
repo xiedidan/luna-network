@@ -25,6 +25,7 @@ class Train(object):
     # constructor
     def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 1, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
+        self.phraseSubPath = "train/"
         self.iterationCount = iterationCount
         self.batchSize = batchSize
         self.volSize = volSize
@@ -51,7 +52,7 @@ class Train(object):
 
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
-        groundTruth = sample["groundTruth"]
+        # groundTruth = sample["groundTruth"]
 
         if np.random.random() < rotateRatio:
             # rotate - p(3, 3) - 1 possibles
@@ -80,15 +81,16 @@ class Train(object):
 
         crop = {}
         crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
-        crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
+        # resnext doesn't need to shift label
+        # crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
         return crop
 
     def dataProcessor(self, dataQueue):
-        npyFileList = glob(self.dataPath + "npy/nodules/*.npy")
+        npyFileList = glob(self.dataPath + self.phraseSubPath + "nodules/*.npy")
         npyFileList = map(lambda filePath: os.path.basename(filePath), npyFileList)
 
         # load all samples
-        samples = self.loadAllSamples("npy/", npyFileList)
+        samples = self.loadAllSamples(self.phraseSubPath, npyFileList)
 
         for sample in samples:
             image = sample["image"]
@@ -165,5 +167,5 @@ class Train(object):
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/")
+    trainer = Train("d:/project/tianchi/data/experiment/")
     trainer.train()

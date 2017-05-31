@@ -154,7 +154,7 @@ class Train(object):
         dataQueue = multiprocessing.Queue(self.queueSize)
 
         dataProcess = []
-        # start dataProcessor
+        # start dataProcessorg
         for i in range(1):
           dataProcess.append(multiprocessing.Process(target = self.dataProcessor, args = (dataQueue,)))
           dataProcess[i].daemon = True
@@ -162,12 +162,12 @@ class Train(object):
           dataProcess[i].start()
 
         caffe.set_device(0)
-        caffe.set_mode_cpu()
+        caffe.set_mode_gpu()
         solver = caffe.SGDSolver("solver.prototxt")
 
         # start trainProcessor in main process
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/experiment/")
+    trainer = Train("c:/project/tianchi/data/experiment/")
     trainer.train()

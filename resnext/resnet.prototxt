@@ -4,7 +4,7 @@ input: "data"
 input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 2 dim: 1 dim: 1 }
+input_shape { dim: 2 dim: 2 }
 
 # Input block
 
@@ -2918,9 +2918,9 @@ layer {
   bottom: "res5b2"
   top: "pool5"
   pooling_param {
-    pool: AVE
-    kernel_size: 7
-    stride: 1
+    pool: MAX
+    kernel_size: 2
+    stride: 2
   }
 }
 layer {
@@ -2937,7 +2937,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 1000
+    num_output: 2
     weight_filler {
       type: "xavier"
     }
@@ -2948,10 +2948,38 @@ layer {
   }
 }
 layer {
+    name: "reshape"
+    type: "Reshape"
+    bottom: "classifier"
+    top: "classifier_reshape"
+    reshape_param {
+      shape {
+        dim: 0  # copy the dimension from below
+        dim: 1
+        dim: 2
+        dim: -1
+      }
+    }
+  }
+
+layer {
+  name: "softmax"
+  type: "Softmax"
+  bottom: "classifier_reshape"
+  top: "prob"
+  softmax_param{
+    axis: 1
+  }
+}
+
+layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "classifier"
+  bottom: "classifier_reshape"
   bottom: "label"
   top: "loss"
+  softmax_param{
+    axis: 1
+  }
 }
 

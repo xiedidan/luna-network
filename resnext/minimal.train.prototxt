@@ -1,10 +1,10 @@
 # Enter your network definition here.
 # Use Shift+Enter to update the visualization.
 input: "data"
-input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 1 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 2 dim: 2 }
+input_shape { dim: 1 dim: 2 }
 
 # Input block
 
@@ -290,7 +290,6 @@ layer {
         dim: 0  # copy the dimension from below
         dim: 1
         dim: 2
-        dim: -1
       }
     }
   }
@@ -298,10 +297,10 @@ layer {
 layer {
   name: "softmax"
   type: "Softmax"
-  bottom: "classifier_reshape"
+  bottom: "classifier"
   top: "prob"
   softmax_param{
-    axis: 1
+    axis: 2
   }
 }
 
@@ -312,6 +311,6 @@ layer {
   bottom: "label"
   top: "loss"
   softmax_param{
-    axis: 1
+    axis: 2
   }
 }

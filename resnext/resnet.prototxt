@@ -4,7 +4,7 @@ input: "data"
 input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 2 dim: 2 }
+input_shape { dim: 2 dim: 1 dim: 1 }
 
 # Input block
 
@@ -2937,7 +2937,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2
+    num_output: 1
     weight_filler {
       type: "xavier"
     }
@@ -2947,39 +2947,34 @@ layer {
     }
   }
 }
-layer {
-    name: "reshape"
-    type: "Reshape"
-    bottom: "classifier"
-    top: "classifier_reshape"
-    reshape_param {
-      shape {
-        dim: 0  # copy the dimension from below
-        dim: 1
-        dim: 2
-        dim: -1
-      }
-    }
-  }
 
 layer {
-  name: "softmax"
-  type: "Softmax"
-  bottom: "classifier_reshape"
-  top: "prob"
-  softmax_param{
-    axis: 1
+  name: "sigmoid"
+  type: "Sigmoid"
+  bottom: "classifier"
+  top: "sigmoid"
+}
+
+layer {
+  name: "label_reshape"
+  type: "Reshape"
+  bottom: "label"
+  top: "label_reshape"
+  reshape_param {
+    shape: {
+      dim: 0 # copy from prev layer
+      dim: 1
+      dim: 1
+      dim: -1 # compute from other dims
+    }
   }
 }
 
 layer {
   name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "classifier_reshape"
-  bottom: "label"
+  type: "MultinomialLogisticLoss"
+  bottom: "sigmoid"
+  bottom: "label_reshape"
   top: "loss"
-  softmax_param{
-    axis: 1
-  }
 }
 

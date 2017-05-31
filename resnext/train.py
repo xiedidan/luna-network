@@ -122,7 +122,7 @@ class Train(object):
 
     def trainProcessor(self, dataQueue, solver):
         batchData = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
-        batchLabel = np.zeros((self.batchSize, 2))
+        batchLabel = np.zeros((self.batchSize, 1, 1))
 
         trainLoss = np.zeros(self.iterationCount)
         plt.ion()
@@ -133,8 +133,9 @@ class Train(object):
                 [nodule, groundTruth] = dataQueue.get()
 
                 batchData[j, 0, :, :, :] = nodule.astype(dtype = np.float32)
-                groundTruth = np.array([groundTruth])
-                batchLabel[j, :] = groundTruth.astype(dtype = np.float32)
+                groundTruth = np.array([groundTruth[0]])
+                groundTruth = groundTruth.reshape((1, 1))
+                batchLabel[j, :, :] = groundTruth.astype(dtype = np.float32)
 
             solver.net.blobs["data"].data[...] = batchData.astype(dtype = np.float32)
             solver.net.blobs["label"].data[...] = batchLabel.astype(dtype = np.float32)
@@ -169,5 +170,5 @@ class Train(object):
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("c:/project/tianchi/data/experiment/")
+    trainer = Train("d:/project/tianchi/data/experiment/")
     trainer.train()

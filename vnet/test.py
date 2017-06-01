@@ -7,8 +7,8 @@ import os
 import numpy as np
 from glob import glob
 
-import NoduleCropper
-import NoduleSerializer
+from NoduleCropper import NoduleCropper
+from NoduleSerializer import NoduleSerializer
 from scan import Scanner
 
 import caffe
@@ -24,7 +24,7 @@ import matplotlib
 
 class Test(object):
     # constructor
-    def __init__(self, dataPath = "./", snapshot = "_iter_3700.caffemodel", queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", snapshot = "_iter_37000.caffemodel", queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.snapshot = snapshot
         self.queueSize = queueSize
@@ -33,7 +33,7 @@ class Test(object):
 
     # helper
     def dataScanner(self, dataPath, dataQueue):
-        scanner = Scanner(dataPath, dataQueue)
+        scanner = Scanner(dataPath, "test", dataQueue)
         scanner.scanAllFiles()
 
     def testProcess(self, dataQueue, net, serializer):
@@ -41,7 +41,7 @@ class Test(object):
             crop = dataQueue.get()
             net.blobs['data'].data[0, 0, :, :, :] = crop["image"].astype(dtype = np.float32)
 
-            out = net.forware()
+            out = net.forward()
 
             labels = out["reshape_label"]
             serializer.writeToNpy("results/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), np.squeeze(labels.astype(np.float32)))

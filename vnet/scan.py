@@ -11,12 +11,14 @@ from tqdm import tqdm
 from NoduleCropper import NoduleCropper
 from NoduleSerializer import NoduleSerializer
 
-# scan test CTs by 32 stepsize, generate data queue
+# scan CTs by 32 stepsize, generate data queue
 # suppose CTs have already been re-sampled
 
 class Scanner(object):
-    def __init__(self, dataPath, dataQueue, stepSize = 32, cropSize = 64):
+    def __init__(self, dataPath, phrase, dataQueue, stepSize = 32, cropSize = 64):
         self.dataPath = dataPath
+        self.phrase = phrase
+        self.phraseSubPath = self.phrase + "/"
         self.dataQueue = dataQueue
         self.stepSize = stepSize
         self.cropSize = cropSize
@@ -66,6 +68,6 @@ class Scanner(object):
 
     # interface
     def scanAllFiles(self):
-        self.fileList = glob(self.dataPath + "*.npy")
+        self.fileList = glob(self.dataPath + self.phraseSubPath + "nodules/*.npy")
         for file in enumerate(tqdm(self.fileList)):
-            self.scanSingleFile(file)
+            self.scanSingleFile(file[1])

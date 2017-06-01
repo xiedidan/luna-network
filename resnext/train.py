@@ -133,7 +133,7 @@ class Train(object):
                 [nodule, groundTruth] = dataQueue.get()
 
                 batchData[j, 0, :, :, :] = nodule.astype(dtype = np.float32)
-                groundTruth = np.array([groundTruth[0]])
+                groundTruth = np.array([groundTruth])
                 groundTruth = groundTruth.reshape((1, 1))
                 batchLabel[j, :, :] = groundTruth.astype(dtype = np.float32)
 
@@ -170,5 +170,5 @@ class Train(object):
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/experiment/")
+    trainer = Train("c:/project/tianchi/data/experiment/")
     trainer.train()

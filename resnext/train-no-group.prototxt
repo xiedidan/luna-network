@@ -123,7 +123,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -213,7 +212,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -303,7 +301,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -393,7 +390,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -483,7 +479,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -573,7 +568,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -663,7 +657,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -753,7 +746,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -843,7 +835,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -933,7 +924,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1023,7 +1013,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1113,7 +1102,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1203,7 +1191,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1293,7 +1280,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1383,7 +1369,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1473,7 +1458,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1563,7 +1547,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1653,7 +1636,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1743,7 +1725,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1833,7 +1814,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -1923,7 +1903,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2013,7 +1992,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2103,7 +2081,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2193,7 +2170,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2283,7 +2259,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2373,7 +2348,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2463,7 +2437,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2553,7 +2526,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2643,7 +2615,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2733,7 +2704,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2823,7 +2793,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -2913,7 +2882,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "xavier"
@@ -3081,19 +3049,19 @@ layer {
 }
 
 layer {
-  name: "pool_ave"
+  name: "pool_max"
   type: "Pooling"
   bottom: "resx1_elewise"
-  top: "pool_ave"
+  top: "pool_max"
   pooling_param {
-    pool: AVE
+    pool: MAX
     global_pooling: true
   }
 }
 layer {
   name: "classifier"
   type: "InnerProduct"
-  bottom: "pool_ave"
+  bottom: "pool_max"
   top: "classifier"
   param {
     lr_mult: 1
@@ -3104,7 +3072,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 1000
+    num_output: 1
     weight_filler {
       type: "xavier"
     }
@@ -3114,10 +3082,33 @@ layer {
     }
   }
 }
+
+layer {
+  name: "sigmoid"
+  type: "Sigmoid"
+  bottom: "classifier"
+  top: "sigmoid"
+}
+
+layer {
+  name: "label_reshape"
+  type: "Reshape"
+  bottom: "label"
+  top: "label_reshape"
+  reshape_param {
+    shape: {
+      dim: 0 # copy from prev layer
+      dim: 1
+      dim: 1
+      dim: -1 # compute from other dims
+    }
+  }
+}
+
 layer {
   name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "classifier"
-  bottom: "label"
+  type: "MultinomialLogisticLoss"
+  bottom: "sigmoid"
+  bottom: "label_reshape"
   top: "loss"
 }

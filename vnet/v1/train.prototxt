@@ -1,5 +1,8 @@
 input: "data"
-input_shape { dim: 1 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+input: "label"
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 # Input block
 
@@ -16,7 +19,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -99,7 +102,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -126,7 +129,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -151,7 +154,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -185,7 +188,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -212,7 +215,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -237,7 +240,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -262,7 +265,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -296,7 +299,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -323,7 +326,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -348,7 +351,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -373,7 +376,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -407,7 +410,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -443,7 +446,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -468,7 +471,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -493,7 +496,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -527,7 +530,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -563,7 +566,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -588,7 +591,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -622,7 +625,7 @@ layer {
     kernel_size: 2
     pad: 0
     stride: 2
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -658,7 +661,7 @@ layer {
     kernel_size: 5
     pad: 2
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
@@ -694,10 +697,25 @@ layer {
     kernel_size: 1
     pad: 0
     stride: 1
-    weight_filler { type: "xavier" }
+    weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
+
+layer {
+  name: "reshape_label"
+  type: "Reshape"
+  bottom: "label"
+  top: "label_flat"
+  reshape_param {
+    shape {
+      dim: 0  # copy the dimension from below
+      dim: 1
+      dim: -1 # this should be 262144
+    }
+  }
+}
+
 
 layer {
   name: "reshape_result"
@@ -708,7 +726,7 @@ layer {
     shape {
       dim: 0  # copy the dimension from below
       dim: 2
-      dim: 262144
+      dim: -1 # this should be 262144
     }
   }
 }
@@ -718,23 +736,22 @@ layer {
   type: "Softmax"
   bottom: "result_flat"
   top: "softmax"
-  loss_param {
-      ignore_label:2
-  }
 }
 
 layer {
-  name: "reshape_label"
-  type: "Reshape"
+  type: "DiceLoss"
+  name: "dice_loss"
+  top: "dice_loss"
   bottom: "softmax"
-  top: "reshape_label"
-  reshape_param {
-    shape {
-      dim: 1
-      dim: 2
-      dim: 64
-      dim: 64
-      dim: 64
-    }
-  }
+  bottom: "label_flat"
 }
+
+#layer {
+#  name: "dice_loss"
+#  type: "Python"
+#  bottom: "softmax"
+#  bottom: "label_flat"
+#  top: "dice"
+#  python_param { module: "diceLossLayer" layer: "DiceLoss" }
+#  loss_weight: 1
+#}

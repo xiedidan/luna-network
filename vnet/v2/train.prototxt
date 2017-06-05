@@ -1,0 +1,344 @@
+input: "data"
+input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+input: "label"
+input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
+
+# input
+
+layer {
+  name: "conv_i64c16o64_input_1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv_i64c16o64_input_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 16
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c16o64_input_1"
+  type: "PReLU"
+  bottom: "conv_i64c16o64_input_1"
+  top: "relu_i64c16o64_input_1"
+}
+
+layer {
+  name: "conv_i64c32o64_input_2"
+  type: "Convolution"
+  bottom: "relu_i64c16o64_input_1"
+  top: "conv_i64c32o64_input_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c32o64_input_2"
+  type: "PReLU"
+  bottom: "conv_i64c32o64_input_2"
+  top: "relu_i64c32o64_input_2"
+}
+
+layer {
+  name: "conv_i64c64o64_input_3"
+  type: "Convolution"
+  bottom: "relu_i64c32o64_input_2"
+  top: "conv_i64c64o64_input_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c64o64_input_3"
+  type: "PReLU"
+  bottom: "conv_i64c64o64_input_3"
+  top: "relu_i64c64o64_input_3"
+}
+
+# pooling
+
+layer {
+  name: "conv_pooling_i64c64o32"
+  type: "Convolution"
+  bottom: "relu_i64c64o64_input_3"
+  top: "conv_pooling_i64c64o32"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_pooling_i64c64o32"
+  type: "PReLU"
+  bottom: "conv_pooling_i64c64o32"
+  top: "relu_pooling_i64c64o32"
+}
+
+# vally
+
+layer {
+  name: "conv_i32c64o32_vally_1"
+  type: "Convolution"
+  bottom: "relu_pooling_i64c64o32"
+  top: "conv_i32c64o32_vally_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i32c64o32_vally_1"
+  type: "PReLU"
+  bottom: "conv_i32c64o32_vally_1"
+  top: "relu_i32c64o32_vally_1"
+}
+
+layer {
+  name: "conv_i32c64o32_vally_2"
+  type: "Convolution"
+  bottom: "relu_i32c64o32_vally_1"
+  top: "conv_i32c64o32_vally_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i32c64o32_vally_2"
+  type: "PReLU"
+  bottom: "conv_i32c64o32_vally_2"
+  top: "relu_i32c64o32_vally_2"
+}
+
+# depooling
+
+layer {
+  name: "deconv_depooling_i32c64o64"
+  type: "Deconvolution"
+  bottom: "relu_i32c64o32_vally_2"
+  top: "deconv_depooling_i32c64o64"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_depooling_i32c64o64"
+  type: "PReLU"
+  bottom: "deconv_depooling_i32c64o64"
+  top: "relu_depooling_i32c64o64"
+}
+
+# output
+
+layer {
+  name: "concat_output"
+  type: "Concat"
+  bottom: "relu_depooling_i32c64o64"
+  bottom: "relu_i64c64o64_input_3"
+  top: "concat_output"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "conv_i64c128o64_output_1"
+  type: "Convolution"
+  bottom: "concat_output"
+  top: "conv_i64c128o64_output_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c128o64_output_1"
+  type: "PReLU"
+  bottom: "conv_i64c128o64_output_1"
+  top: "relu_i64c128o64_output_1"
+}
+
+layer {
+  name: "conv_i64c64o64_output_2"
+  type: "Convolution"
+  bottom: "relu_i64c128o64_output_1"
+  top: "conv_i64c64o64_output_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c64o64_output_2"
+  type: "PReLU"
+  bottom: "conv_i64c64o64_output_2"
+  top: "relu_i64c64o64_output_2"
+}
+
+layer {
+  name: "conv_i64c32o64_output_3"
+  type: "Convolution"
+  bottom: "relu_i64c64o64_output_2"
+  top: "conv_i64c32o64_output_3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c32o64_output_3"
+  type: "PReLU"
+  bottom: "conv_i64c32o64_output_3"
+  top: "relu_i64c32o64_output_3"
+}
+
+# 1 * 1 * 1 conv
+
+layer {
+  name: "conv_i64c2o64_output_4"
+  type: "Convolution"
+  bottom: "relu_i64c32o64_output_3"
+  top: "conv_i64c2o64_output_4"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 2
+    kernel_size: 1
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i64c2o64_output_4"
+  type: "PReLU"
+  bottom: "conv_i64c2o64_output_4"
+  top: "relu_i64c2o64_output_4"
+}
+
+layer {
+  name: "reshape_output"
+  type: "Reshape"
+  bottom: "relu_i64c2o64_output_4"
+  top: "reshape_output"
+  reshape_param {
+    shape {
+      dim: 0  # copy the dimension from below
+      dim: 2
+      dim: -1 # this should be 262144
+    }
+  }
+}
+
+layer {
+  name: "reshape_label"
+  type: "Reshape"
+  bottom: "label"
+  top: "reshape_label"
+  reshape_param {
+    shape {
+      dim: 0  # copy the dimension from below
+      dim: 1
+      dim: -1 # this should be 262144
+    }
+  }
+}
+
+layer {
+  name: "softmax_output"
+  type: "Softmax"
+  bottom: "reshape_output"
+  top: "softmax_output"
+}
+
+layer {
+  type: "DiceLoss"
+  name: "dice_loss"
+  top: "dice_loss"
+  bottom: "softmax_output"
+  bottom: "reshape_label"
+}

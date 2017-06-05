@@ -23,30 +23,32 @@ import matplotlib
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", iterationCount = 100000, batchSize = 2, queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", netPath = "v1/", batchSize = 2, iterationCount = 100000, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
-        self.phraseSubPath = "train/"
+        self.netPath = netPath
+        self.phrase = "train"
+        self.phraseSubPath = self.phrase + "/"
         self.iterationCount = iterationCount
         self.batchSize = batchSize
         self.volSize = volSize
         self.queueSize = queueSize
 
     # helper
-    def loadSample(self, subPath, filename):
-        serializer = NoduleSerializer.NoduleSerializer(self.dataPath)
+    def loadSample(self, filename):
+        serializer = NoduleSerializer.NoduleSerializer(self.dataPath, self.phrase)
 
         sample = {}
-        image = serializer.readFromNpy(subPath + "nodules/", filename)
-        groundTruth = serializer.readFromNpy(subPath + "groundTruths/", filename)
+        image = serializer.readFromNpy("nodules/", filename)
+        groundTruth = serializer.readFromNpy("groundTruths/", filename)
         sample["image"] = image
         sample["groundTruth"] = groundTruth
 
         return sample
 
-    def loadAllSamples(self, subPath, filenames):
+    def loadAllSamples(self, filenames):
         samples = []
         for filename in filenames:
-            sample = self.loadSample(subPath, filename)
+            sample = self.loadSample(filename)
             samples.append(sample)
         return samples
 
@@ -91,7 +93,7 @@ class Train(object):
         npyFileList = map(lambda filePath: os.path.basename(filePath), npyFileList)
 
         # load all samples
-        samples = self.loadAllSamples(self.phraseSubPath, npyFileList)
+        samples = self.loadAllSamples(npyFileList)
 
         for sample in samples:
             image = sample["image"]
@@ -164,11 +166,11 @@ class Train(object):
 
         caffe.set_device(0)
         caffe.set_mode_gpu()
-        solver = caffe.SGDSolver("solver.prototxt")
+        solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
 
         # start trainProcessor in main process
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/experiment/")
+    trainer = Train("d:/project/tianchi/data/experiment/", "v1/")
     trainer.train()

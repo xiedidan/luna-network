@@ -93,4 +93,5 @@ ENV/
 vnet/.idea
 resnext/.idea
 
-resnext/snapshot
+# training output
+**/snapshot

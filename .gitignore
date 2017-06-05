@@ -93,6 +93,4 @@ ENV/
 vnet/.idea
 resnext/.idea
 
-# network outputs
-vnet/snapshot
 resnext/snapshot

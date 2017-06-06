@@ -111,7 +111,7 @@ class Train(object):
         for sample in enumerate(tqdm(samples)):
             sample = sample[1]
             image = sample["image"]
-            image = self.setWindow(image)
+            # image = self.setWindow(image)
             image = self.normalize(image)
             sample["image"] = image
 
@@ -125,7 +125,7 @@ class Train(object):
                 #sample = samples[0]
 
                 # randomized cropping
-                sample = self.randomizedCrop(sample, 0.3, 0.3)
+                sample = self.randomizedCrop(sample, 0.5, 0.5)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
                 # print(dataQueue.qsize())
@@ -178,5 +178,5 @@ class Train(object):
         self.trainProcessor(dataQueue, solver)
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/", "v2/", 2)
+    trainer = Train("d:/project/tianchi/data/", "v2/", 4)
     trainer.train()

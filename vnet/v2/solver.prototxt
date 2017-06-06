@@ -1,6 +1,6 @@
 net: "./v2/train.prototxt"
 snapshot_prefix: "./v2/snapshot/"
-base_lr: 0.002
+base_lr: 0.0002
 momentum: 0.9
 weight_decay: 0.0005
 lr_policy: "step"

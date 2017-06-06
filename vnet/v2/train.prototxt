@@ -1,21 +1,95 @@
 input: "data"
-input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 input: "label"
-input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
+input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
 
 # input
 
+#layer {
+#  name: "conv_i64c32o64_input_1"
+#  type: "Convolution"
+#  bottom: "data"
+#  top: "conv_i64c32o64_input_1"
+#  param { lr_mult: 1.0 decay_mult: 1.0 }
+#  param { lr_mult: 2.0 decay_mult: 0.0 }
+#  convolution_param {
+#    engine: CUDNN
+#    num_output: 32
+#    kernel_size: 1
+#    pad: 0
+#    stride: 1
+#    weight_filler { type: "msra" variance_norm: 2 }
+#    bias_filler { type: "constant" value: 0.0 }
+#  }
+#}
+
+#layer {
+#  name: "relu_i64c32o64_input_1"
+#  type: "PReLU"
+#  bottom: "conv_i64c32o64_input_1"
+#  top: "relu_i64c32o64_input_1"
+#}
+
+# Create 16 channel data for residual function
+
 layer {
-  name: "conv_i64c32o64_input_1"
+  name: "split_input"
+  type: "Split"
+  bottom: "data"
+  top: "split_input_1"
+  top: "split_input_2"
+  top: "split_input_3"
+  top: "split_input_4"
+  top: "split_input_5"
+  top: "split_input_6"
+  top: "split_input_7"
+  top: "split_input_8"
+  top: "split_input_9"
+  top: "split_input_10"
+  top: "split_input_11"
+  top: "split_input_12"
+  top: "split_input_13"
+  top: "split_input_14"
+  top: "split_input_15"
+  top: "split_input_16"
+}
+
+# Concat into channel
+
+layer {
+  name: "concat_input"
+  type: "Concat"
+  bottom: "split_input_1"
+  bottom: "split_input_2"
+  bottom: "split_input_3"
+  bottom: "split_input_4"
+  bottom: "split_input_5"
+  bottom: "split_input_6"
+  bottom: "split_input_7"
+  bottom: "split_input_8"
+  bottom: "split_input_9"
+  bottom: "split_input_10"
+  bottom: "split_input_11"
+  bottom: "split_input_12"
+  bottom: "split_input_13"
+  bottom: "split_input_14"
+  bottom: "split_input_15"
+  bottom: "split_input_16"
+  top: "concat_input"
+  concat_param { axis: 1 }
+}
+
+layer {
+  name: "conv_i64c16o64_input_2"
   type: "Convolution"
   bottom: "data"
-  top: "conv_i64c32o64_input_1"
+  top: "conv_i64c16o64_input_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 32
+    num_output: 16
     kernel_size: 3
     pad: 1
     stride: 1
@@ -25,47 +99,22 @@ layer {
 }
 
 layer {
-  name: "relu_i64c32o64_input_1"
+  name: "relu_i64c16o64_input_2"
   type: "PReLU"
-  bottom: "conv_i64c32o64_input_1"
-  top: "relu_i64c32o64_input_1"
+  bottom: "conv_i64c16o64_input_2"
+  top: "relu_i64c16o64_input_2"
 }
 
 layer {
-  name: "conv_i64c32o64_input_2"
+  name: "conv_i64c16o64_input_3"
   type: "Convolution"
-  bottom: "relu_i64c32o64_input_1"
-  top: "conv_i64c32o64_input_2"
+  bottom: "relu_i64c16o64_input_2"
+  top: "conv_i64c16o64_input_3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 32
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "relu_i64c32o64_input_2"
-  type: "PReLU"
-  bottom: "conv_i64c32o64_input_2"
-  top: "relu_i64c32o64_input_2"
-}
-
-layer {
-  name: "conv_i64c32o64_input_3"
-  type: "Convolution"
-  bottom: "relu_i64c32o64_input_2"
-  top: "conv_i64c32o64_input_3"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    engine: CUDNN
-    num_output: 32
+    num_output: 16
     kernel_size: 3
     pad: 1
     stride: 1
@@ -77,8 +126,8 @@ layer {
 layer {
   name: "add_input"
   type: "Eltwise"
-  bottom: "relu_i64c32o64_input_1"
-  bottom: "conv_i64c32o64_input_3"
+  bottom: "concat_input"
+  bottom: "conv_i64c16o64_input_3"
   top: "add_input"
   eltwise_param { operation: SUM }
 }
@@ -93,98 +142,10 @@ layer {
 # pooling
 
 layer {
-  name: "conv_pooling_i64c64o32"
+  name: "conv_pooling_i64c32o32"
   type: "Convolution"
   bottom: "relu_add_input"
-  top: "conv_pooling_i64c64o32"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    engine: CUDNN
-    num_output: 64
-    kernel_size: 2
-    pad: 0
-    stride: 2
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "relu_pooling_i64c64o32"
-  type: "PReLU"
-  bottom: "conv_pooling_i64c64o32"
-  top: "relu_pooling_i64c64o32"
-}
-
-# vally
-
-layer {
-  name: "conv_i32c64o32_vally_1"
-  type: "Convolution"
-  bottom: "relu_pooling_i64c64o32"
-  top: "conv_i32c64o32_vally_1"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    engine: CUDNN
-    num_output: 64
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "relu_i32c64o32_vally_1"
-  type: "PReLU"
-  bottom: "conv_i32c64o32_vally_1"
-  top: "relu_i32c64o32_vally_1"
-}
-
-layer {
-  name: "conv_i32c64o32_vally_2"
-  type: "Convolution"
-  bottom: "relu_i32c64o32_vally_1"
-  top: "conv_i32c64o32_vally_2"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
-  convolution_param {
-    engine: CUDNN
-    num_output: 64
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    weight_filler { type: "msra" variance_norm: 2 }
-    bias_filler { type: "constant" value: 0.0 }
-  }
-}
-
-layer {
-  name: "add_vally"
-  type: "Eltwise"
-  bottom: "relu_pooling_i64c64o32"
-  bottom: "conv_i32c64o32_vally_2"
-  top: "add_vally"
-  eltwise_param { operation: SUM }
-}
-
-layer {
-  name: "relu_add_vally"
-  type: "PReLU"
-  bottom: "add_vally"
-  top: "relu_add_vally"
-}
-
-# depooling
-
-layer {
-  name: "deconv_depooling_i32c32o64"
-  type: "Deconvolution"
-  bottom: "relu_add_vally"
-  top: "deconv_depooling_i32c32o64"
+  top: "conv_pooling_i64c32o32"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -199,10 +160,98 @@ layer {
 }
 
 layer {
-  name: "relu_depooling_i32c32o64"
+  name: "relu_pooling_i64c32o32"
   type: "PReLU"
-  bottom: "deconv_depooling_i32c32o64"
-  top: "relu_depooling_i32c32o64"
+  bottom: "conv_pooling_i64c32o32"
+  top: "relu_pooling_i64c32o32"
+}
+
+# vally
+
+layer {
+  name: "conv_i32c32o32_vally_1"
+  type: "Convolution"
+  bottom: "relu_pooling_i64c32o32"
+  top: "conv_i32c32o32_vally_1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_i32c32o32_vally_1"
+  type: "PReLU"
+  bottom: "conv_i32c32o32_vally_1"
+  top: "relu_i32c32o32_vally_1"
+}
+
+layer {
+  name: "conv_i32c32o32_vally_2"
+  type: "Convolution"
+  bottom: "relu_i32c32o32_vally_1"
+  top: "conv_i32c32o32_vally_2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "add_vally"
+  type: "Eltwise"
+  bottom: "relu_pooling_i64c32o32"
+  bottom: "conv_i32c32o32_vally_2"
+  top: "add_vally"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_add_vally"
+  type: "PReLU"
+  bottom: "add_vally"
+  top: "relu_add_vally"
+}
+
+# depooling
+
+layer {
+  name: "deconv_depooling_i32c16o64"
+  type: "Deconvolution"
+  bottom: "relu_add_vally"
+  top: "deconv_depooling_i32c16o64"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 16
+    kernel_size: 2
+    pad: 0
+    stride: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "relu_depooling_i32c16o64"
+  type: "PReLU"
+  bottom: "deconv_depooling_i32c16o64"
+  top: "relu_depooling_i32c16o64"
 }
 
 # output
@@ -210,22 +259,22 @@ layer {
 layer {
   name: "concat_output"
   type: "Concat"
-  bottom: "relu_depooling_i32c32o64"
+  bottom: "relu_depooling_i32c16o64"
   bottom: "relu_add_input"
   top: "concat_output"
   concat_param { axis: 1 }
 }
 
 layer {
-  name: "conv_i64c64o64_output_1"
+  name: "conv_i64c32o64_output_1"
   type: "Convolution"
   bottom: "concat_output"
-  top: "conv_i64c64o64_output_1"
+  top: "conv_i64c32o64_output_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 64
+    num_output: 32
     kernel_size: 3
     pad: 1
     stride: 1
@@ -235,22 +284,22 @@ layer {
 }
 
 layer {
-  name: "relu_i64c64o64_output_1"
+  name: "relu_i64c32o64_output_1"
   type: "PReLU"
-  bottom: "conv_i64c64o64_output_1"
-  top: "relu_i64c64o64_output_1"
+  bottom: "conv_i64c32o64_output_1"
+  top: "relu_i64c32o64_output_1"
 }
 
 layer {
-  name: "conv_i64c64o64_output_2"
+  name: "conv_i64c32o64_output_2"
   type: "Convolution"
-  bottom: "relu_i64c64o64_output_1"
-  top: "conv_i64c64o64_output_2"
+  bottom: "relu_i64c32o64_output_1"
+  top: "conv_i64c32o64_output_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 64
+    num_output: 32
     kernel_size: 3
     pad: 1
     stride: 1
@@ -260,22 +309,22 @@ layer {
 }
 
 layer {
-  name: "relu_i64c64o64_output_2"
+  name: "relu_i64c32o64_output_2"
   type: "PReLU"
-  bottom: "conv_i64c64o64_output_2"
-  top: "relu_i64c64o64_output_2"
+  bottom: "conv_i64c32o64_output_2"
+  top: "relu_i64c32o64_output_2"
 }
 
 layer {
-  name: "conv_i64c64o64_output_3"
+  name: "conv_i64c32o64_output_3"
   type: "Convolution"
-  bottom: "relu_i64c64o64_output_2"
-  top: "conv_i64c64o64_output_3"
+  bottom: "relu_i64c32o64_output_2"
+  top: "conv_i64c32o64_output_3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 64
+    num_output: 32
     kernel_size: 3
     pad: 1
     stride: 1
@@ -288,7 +337,7 @@ layer {
   name: "add_output"
   type: "Eltwise"
   bottom: "concat_output"
-  bottom: "conv_i64c64o64_output_3"
+  bottom: "conv_i64c32o64_output_3"
   top: "add_output"
   eltwise_param { operation: SUM }
 }
@@ -313,24 +362,24 @@ layer {
     engine: CUDNN
     num_output: 2
     kernel_size: 1
-    pad: 1
+    pad: 0
     stride: 1
     weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
   }
 }
 
-layer {
-  name: "relu_i64c2o64_output_4"
-  type: "PReLU"
-  bottom: "conv_i64c2o64_output_4"
-  top: "relu_i64c2o64_output_4"
-}
+#layer {
+#  name: "relu_i64c2o64_output_4"
+#  type: "PReLU"
+#  bottom: "conv_i64c2o64_output_4"
+#  top: "relu_i64c2o64_output_4"
+#}
 
 layer {
   name: "reshape_output"
   type: "Reshape"
-  bottom: "relu_i64c2o64_output_4"
+  bottom: "conv_i64c2o64_output_4"
   top: "reshape_output"
   reshape_param {
     shape {

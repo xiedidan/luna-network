@@ -1,4 +1,4 @@
-net: "./train-no-group.prototxt"
+net: "./v1/train.prototxt"
 snapshot_prefix: "./snapshot/"
 base_lr: 0.0001
 momentum: 0.9

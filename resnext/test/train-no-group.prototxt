@@ -1,5 +1,6 @@
 # Enter your network definition here.
 # Use Shift+Enter to update the visualization.
+# resNeXt no group convolution version
 input: "data"
 input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 

@@ -76,6 +76,7 @@ class Train(object):
             dir = np.random.randint(0, 4)
             rotate = rotateList[dir]
             image = np.transpose(image, rotate)
+            groundTruth = np.transpose(groundTruth, rotate)
 
         centerRange = [32, 96]
         if np.random.random() < shiftRatio:

@@ -1,0 +1,702 @@
+layer {
+  name: "data"
+  type: "Python"
+  top: "data"
+  top: "label"
+  python_param {
+    module: "NpyDataLayer"
+    layer: "NpyDataLayer"
+    param_str: "{\'shift_ratio\': 0.5, \'net_path\': \'v3/\', \'iter_count\': 100000, \'queue_size\': 30, \'phase\': \'test\', \'rotate_ratio\': 0.5, \'vol_size\': 64, \'data_path\': \'d:/project/tianchi/data/\', \'batch_size\': 2}"
+  }
+}
+layer {
+  name: "split_input1"
+  type: "Split"
+  bottom: "data"
+  top: "split_input1"
+  top: "split_input2"
+  top: "split_input3"
+  top: "split_input4"
+  top: "split_input5"
+  top: "split_input6"
+  top: "split_input7"
+  top: "split_input8"
+  top: "split_input9"
+  top: "split_input10"
+  top: "split_input11"
+  top: "split_input12"
+  top: "split_input13"
+  top: "split_input14"
+  top: "split_input15"
+  top: "split_input16"
+}
+layer {
+  name: "concat_input"
+  type: "Concat"
+  bottom: "split_input1"
+  bottom: "split_input2"
+  bottom: "split_input3"
+  bottom: "split_input4"
+  bottom: "split_input5"
+  bottom: "split_input6"
+  bottom: "split_input7"
+  bottom: "split_input8"
+  bottom: "split_input9"
+  bottom: "split_input10"
+  bottom: "split_input11"
+  bottom: "split_input12"
+  bottom: "split_input13"
+  bottom: "split_input14"
+  bottom: "split_input15"
+  bottom: "split_input16"
+  top: "concat_input"
+}
+layer {
+  name: "left1_bn1"
+  type: "BatchNorm"
+  bottom: "concat_input"
+  top: "left1_bn1"
+}
+layer {
+  name: "left1_relu1"
+  type: "PReLU"
+  bottom: "left1_bn1"
+  top: "left1_relu1"
+}
+layer {
+  name: "left1_conv1"
+  type: "Convolution"
+  bottom: "left1_relu1"
+  top: "left1_conv1"
+  convolution_param {
+    num_output: 16
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left1_bn2"
+  type: "BatchNorm"
+  bottom: "left1_conv1"
+  top: "left1_bn2"
+}
+layer {
+  name: "left1_relu2"
+  type: "PReLU"
+  bottom: "left1_bn2"
+  top: "left1_relu2"
+}
+layer {
+  name: "left1_conv2"
+  type: "Convolution"
+  bottom: "left1_relu2"
+  top: "left1_conv2"
+  convolution_param {
+    num_output: 16
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left1_add"
+  type: "Eltwise"
+  bottom: "concat_input"
+  bottom: "left1_conv2"
+  top: "left1_add"
+}
+layer {
+  name: "pooling1"
+  type: "Convolution"
+  bottom: "left1_add"
+  top: "pooling1"
+  convolution_param {
+    num_output: 32
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "left2_bn1"
+  type: "BatchNorm"
+  bottom: "pooling1"
+  top: "left2_bn1"
+}
+layer {
+  name: "left2_relu1"
+  type: "PReLU"
+  bottom: "left2_bn1"
+  top: "left2_relu1"
+}
+layer {
+  name: "left2_conv1"
+  type: "Convolution"
+  bottom: "left2_relu1"
+  top: "left2_conv1"
+  convolution_param {
+    num_output: 32
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left2_bn2"
+  type: "BatchNorm"
+  bottom: "left2_conv1"
+  top: "left2_bn2"
+}
+layer {
+  name: "left2_relu2"
+  type: "PReLU"
+  bottom: "left2_bn2"
+  top: "left2_relu2"
+}
+layer {
+  name: "left2_conv2"
+  type: "Convolution"
+  bottom: "left2_relu2"
+  top: "left2_conv2"
+  convolution_param {
+    num_output: 32
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left2_bn3"
+  type: "BatchNorm"
+  bottom: "left2_conv2"
+  top: "left2_bn3"
+}
+layer {
+  name: "left2_relu3"
+  type: "PReLU"
+  bottom: "left2_bn3"
+  top: "left2_relu3"
+}
+layer {
+  name: "left2_conv3"
+  type: "Convolution"
+  bottom: "left2_relu3"
+  top: "left2_conv3"
+  convolution_param {
+    num_output: 32
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left2_add"
+  type: "Eltwise"
+  bottom: "pooling1"
+  bottom: "left2_conv3"
+  top: "left2_add"
+}
+layer {
+  name: "pooling2"
+  type: "Convolution"
+  bottom: "left2_add"
+  top: "pooling2"
+  convolution_param {
+    num_output: 64
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "left3_bn1"
+  type: "BatchNorm"
+  bottom: "pooling2"
+  top: "left3_bn1"
+}
+layer {
+  name: "left3_relu1"
+  type: "PReLU"
+  bottom: "left3_bn1"
+  top: "left3_relu1"
+}
+layer {
+  name: "left3_conv1"
+  type: "Convolution"
+  bottom: "left3_relu1"
+  top: "left3_conv1"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left3_bn2"
+  type: "BatchNorm"
+  bottom: "left3_conv1"
+  top: "left3_bn2"
+}
+layer {
+  name: "left3_relu2"
+  type: "PReLU"
+  bottom: "left3_bn2"
+  top: "left3_relu2"
+}
+layer {
+  name: "left3_conv2"
+  type: "Convolution"
+  bottom: "left3_relu2"
+  top: "left3_conv2"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left3_bn3"
+  type: "BatchNorm"
+  bottom: "left3_conv2"
+  top: "left3_bn3"
+}
+layer {
+  name: "left3_relu3"
+  type: "PReLU"
+  bottom: "left3_bn3"
+  top: "left3_relu3"
+}
+layer {
+  name: "left3_conv3"
+  type: "Convolution"
+  bottom: "left3_relu3"
+  top: "left3_conv3"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "left3_add"
+  type: "Eltwise"
+  bottom: "pooling2"
+  bottom: "left3_conv3"
+  top: "left3_add"
+}
+layer {
+  name: "pooling3"
+  type: "Convolution"
+  bottom: "left3_add"
+  top: "pooling3"
+  convolution_param {
+    num_output: 128
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "vally_bn1"
+  type: "BatchNorm"
+  bottom: "pooling3"
+  top: "vally_bn1"
+}
+layer {
+  name: "vally_relu1"
+  type: "PReLU"
+  bottom: "vally_bn1"
+  top: "vally_relu1"
+}
+layer {
+  name: "vally_conv1"
+  type: "Convolution"
+  bottom: "vally_relu1"
+  top: "vally_conv1"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "vally_bn2"
+  type: "BatchNorm"
+  bottom: "vally_conv1"
+  top: "vally_bn2"
+}
+layer {
+  name: "vally_relu2"
+  type: "PReLU"
+  bottom: "vally_bn2"
+  top: "vally_relu2"
+}
+layer {
+  name: "vally_conv2"
+  type: "Convolution"
+  bottom: "vally_relu2"
+  top: "vally_conv2"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "vally_bn3"
+  type: "BatchNorm"
+  bottom: "vally_conv2"
+  top: "vally_bn3"
+}
+layer {
+  name: "vally_relu3"
+  type: "PReLU"
+  bottom: "vally_bn3"
+  top: "vally_relu3"
+}
+layer {
+  name: "vally_conv3"
+  type: "Convolution"
+  bottom: "vally_relu3"
+  top: "vally_conv3"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "vally_add"
+  type: "Eltwise"
+  bottom: "pooling3"
+  bottom: "vally_conv3"
+  top: "vally_add"
+}
+layer {
+  name: "depooling1"
+  type: "Deconvolution"
+  bottom: "vally_add"
+  top: "depooling1"
+  convolution_param {
+    num_output: 64
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "concat1"
+  type: "Concat"
+  bottom: "left3_add"
+  bottom: "depooling1"
+  top: "concat1"
+}
+layer {
+  name: "right1_bn1"
+  type: "BatchNorm"
+  bottom: "concat1"
+  top: "right1_bn1"
+}
+layer {
+  name: "right1_relu1"
+  type: "PReLU"
+  bottom: "right1_bn1"
+  top: "right1_relu1"
+}
+layer {
+  name: "right1_conv1"
+  type: "Convolution"
+  bottom: "right1_relu1"
+  top: "right1_conv1"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right1_bn2"
+  type: "BatchNorm"
+  bottom: "right1_conv1"
+  top: "right1_bn2"
+}
+layer {
+  name: "right1_relu2"
+  type: "PReLU"
+  bottom: "right1_bn2"
+  top: "right1_relu2"
+}
+layer {
+  name: "right1_conv2"
+  type: "Convolution"
+  bottom: "right1_relu2"
+  top: "right1_conv2"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right1_bn3"
+  type: "BatchNorm"
+  bottom: "right1_conv2"
+  top: "right1_bn3"
+}
+layer {
+  name: "right1_relu3"
+  type: "PReLU"
+  bottom: "right1_bn3"
+  top: "right1_relu3"
+}
+layer {
+  name: "right1_conv3"
+  type: "Convolution"
+  bottom: "right1_relu3"
+  top: "right1_conv3"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right1_add"
+  type: "Eltwise"
+  bottom: "concat1"
+  bottom: "right1_conv3"
+  top: "right1_add"
+}
+layer {
+  name: "depooling2"
+  type: "Deconvolution"
+  bottom: "right1_add"
+  top: "depooling2"
+  convolution_param {
+    num_output: 32
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "concat2"
+  type: "Concat"
+  bottom: "left2_add"
+  bottom: "depooling2"
+  top: "concat2"
+}
+layer {
+  name: "right2_bn1"
+  type: "BatchNorm"
+  bottom: "concat2"
+  top: "right2_bn1"
+}
+layer {
+  name: "right2_relu1"
+  type: "PReLU"
+  bottom: "right2_bn1"
+  top: "right2_relu1"
+}
+layer {
+  name: "right2_conv1"
+  type: "Convolution"
+  bottom: "right2_relu1"
+  top: "right2_conv1"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right2_bn2"
+  type: "BatchNorm"
+  bottom: "right2_conv1"
+  top: "right2_bn2"
+}
+layer {
+  name: "right2_relu2"
+  type: "PReLU"
+  bottom: "right2_bn2"
+  top: "right2_relu2"
+}
+layer {
+  name: "right2_conv2"
+  type: "Convolution"
+  bottom: "right2_relu2"
+  top: "right2_conv2"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right2_bn3"
+  type: "BatchNorm"
+  bottom: "right2_conv2"
+  top: "right2_bn3"
+}
+layer {
+  name: "right2_relu3"
+  type: "PReLU"
+  bottom: "right2_bn3"
+  top: "right2_relu3"
+}
+layer {
+  name: "right2_conv3"
+  type: "Convolution"
+  bottom: "right2_relu3"
+  top: "right2_conv3"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right2_add"
+  type: "Eltwise"
+  bottom: "concat2"
+  bottom: "right2_conv3"
+  top: "right2_add"
+}
+layer {
+  name: "depooling3"
+  type: "Deconvolution"
+  bottom: "right2_add"
+  top: "depooling3"
+  convolution_param {
+    num_output: 16
+    pad: 0
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "concat3"
+  type: "Concat"
+  bottom: "left1_add"
+  bottom: "depooling3"
+  top: "concat3"
+}
+layer {
+  name: "right3_bn1"
+  type: "BatchNorm"
+  bottom: "concat3"
+  top: "right3_bn1"
+}
+layer {
+  name: "right3_relu1"
+  type: "PReLU"
+  bottom: "right3_bn1"
+  top: "right3_relu1"
+}
+layer {
+  name: "right3_conv1"
+  type: "Convolution"
+  bottom: "right3_relu1"
+  top: "right3_conv1"
+  convolution_param {
+    num_output: 32
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right3_bn2"
+  type: "BatchNorm"
+  bottom: "right3_conv1"
+  top: "right3_bn2"
+}
+layer {
+  name: "right3_relu2"
+  type: "PReLU"
+  bottom: "right3_bn2"
+  top: "right3_relu2"
+}
+layer {
+  name: "right3_conv2"
+  type: "Convolution"
+  bottom: "right3_relu2"
+  top: "right3_conv2"
+  convolution_param {
+    num_output: 32
+    pad: 1
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "right3_add"
+  type: "Eltwise"
+  bottom: "concat3"
+  bottom: "right3_conv2"
+  top: "right3_add"
+}
+layer {
+  name: "conv_output"
+  type: "Convolution"
+  bottom: "right3_add"
+  top: "conv_output"
+  convolution_param {
+    num_output: 2
+    pad: 0
+    kernel_size: 1
+    stride: 1
+  }
+}
+layer {
+  name: "flat_output"
+  type: "Reshape"
+  bottom: "conv_output"
+  top: "flat_output"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 2
+      dim: -1
+    }
+  }
+}
+layer {
+  name: "flat_label"
+  type: "Reshape"
+  bottom: "label"
+  top: "flat_label"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 1
+      dim: -1
+    }
+  }
+}
+layer {
+  name: "softmax_output"
+  type: "Softmax"
+  bottom: "flat_output"
+  top: "softmax_output"
+}
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "softmax_output"
+  bottom: "flat_label"
+  top: "accuracy"
+}

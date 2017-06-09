@@ -17,7 +17,7 @@ layer {
     engine: CUDNN
     num_output: 16
     kernel_size: 3
-    pad: 2
+    pad: 1
     stride: 1
     weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
@@ -127,7 +127,7 @@ layer {
     engine: CUDNN
     num_output: 32
     kernel_size: 3
-    pad: 2
+    pad: 1
     stride: 1
     weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }
@@ -152,7 +152,7 @@ layer {
     engine: CUDNN
     num_output: 32
     kernel_size: 3
-    pad: 2
+    pad: 1
     stride: 1
     weight_filler { type: "msra" variance_norm: 2 }
     bias_filler { type: "constant" value: 0.0 }

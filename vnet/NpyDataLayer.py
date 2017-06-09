@@ -2,36 +2,76 @@
 
 import sys
 sys.path.append("../luna-data-pre-processing")
-import os
-from glob import glob
-
 import NoduleCropper
 import NoduleSerializer
 
-import caffe
+import os
+from glob import glob
 import multiprocessing
-import threading
-import gc
 
-import SimpleITK as sitk
 import numpy as np
-import scipy.ndimage
-import matplotlib.pyplot as plt
-import matplotlib
-
 from tqdm import tqdm
 
-class Train(object):
-    # constructor
-    def __init__(self, dataPath = "./", netPath = "v1/", batchSize = 2, iterationCount = 100000, queueSize = 32, volSize = 64):
-        self.dataPath = dataPath
-        self.netPath = netPath
-        self.phase = "train"
+import caffe
+
+class NpyDataLayer(caffe.Layer):
+    def setup(self, bottom, top):
+        self.top_names = ["data", "label"]
+
+        params = eval(self.param_str)
+        # check_params(params)
+
+        self.batch_size = params["batch_size"]
+        self.vol_size = params["vol_size"]
+        self.batch_loader = BatchLoader(params)
+
+        top[0].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
+        top[1].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
+
+        # print_info("NpyDataLayer", params)
+
+    def forward(self, bottom, top):
+        for i in range(self.batch_size):
+            image, groundTruth = self.batch_loader.load()
+
+            top[0].data[i, ...] = image
+            top[1].data[i, ...] = groundTruth
+
+    def reshape(self, bottom, top):
+        pass
+
+    def backward(self, bottom, top):
+        pass
+
+class BatchLoader(object):
+    def __init__(self, params):
+        self.batchSize = params["batch_size"]
+        self.volSize = params["vol_size"]
+        self.iterationCount = params["iter_count"]
+        self.queueSize = params["queue_size"]
+        self.shiftRatio = params["shift_ratio"]
+        self.rotateRatio = params["rotate_ratio"]
+
+        self.dataPath = params["data_path"]
+        self.netPath = params["net_path"]
+        self.phase = params["phase"]
         self.phaseSubPath = self.phase + "/"
-        self.iterationCount = iterationCount
-        self.batchSize = batchSize
-        self.volSize = volSize
-        self.queueSize = queueSize
+
+        self.dataQueue = multiprocessing.Queue(self.queueSize)
+
+        if self.phase == "deploy":
+            # scan
+            pass
+        else:
+            # load all nodules and groundTruths
+            dataProcess = multiprocessing.Process(target = self.dataProcessor, args = (self.dataQueue,))
+            dataProcess.daemon = True
+            dataProcess.start()
+
+    # interface
+    def load(self):
+        [nodule, groundTruth] = self.dataQueue.get()
+        return nodule, groundTruth
 
     # helper
     def loadSample(self, filename):
@@ -53,7 +93,7 @@ class Train(object):
             samples.append(sample)
         return samples
 
-    def setWindow(self, image, upperBound = 400.0, lowerBound = -1000.0):
+    def setWindow(self, image, upperBound=400.0, lowerBound=-1000.0):
         image[image > upperBound] = upperBound
         image[image < lowerBound] = lowerBound
         return image
@@ -123,61 +163,11 @@ class Train(object):
                 # get random sample
                 noduleIndex = np.random.randint(0, len(samples) - 1)
                 sample = samples[noduleIndex]
-                #sample = samples[0]
+                # sample = samples[0]
 
                 # randomized cropping
-                sample = self.randomizedCrop(sample, 0.5, 0.5)
+                if self.phase == "train":
+                    sample = self.randomizedCrop(sample, self.rotateRatio, self.shiftRatio)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
-                # print(dataQueue.qsize())
-
-    def trainProcessor(self, dataQueue, solver):
-        batchData = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
-        batchLabel = np.zeros((self.batchSize, 1, self.volSize, self.volSize, self.volSize))
-
-        trainLoss = np.zeros(self.iterationCount)
-        plt.ion()
-
-        for i in range(self.iterationCount):
-            for j in range(self.batchSize):
-                # get a batch in each iteration
-                [nodule, groundTruth] = dataQueue.get()
-
-                batchData[j, 0, :, :, :] = nodule.astype(dtype = np.float32)
-                batchLabel[j, 0, :, :, :] = groundTruth.astype(dtype = np.float32)
-
-            solver.net.blobs["data"].data[...] = batchData.astype(dtype = np.float32)
-            solver.net.blobs["label"].data[...] = batchLabel.astype(dtype = np.float32)
-
-            solver.step(1)
-
-            trainLoss[i] = solver.net.blobs["dice_loss"].data
-            if np.mod(i, 30) == 0:
-                plt.clf()
-                plt.plot(range(0, i), trainLoss[0:i])
-                plt.pause(0.00000001)
-
-            matplotlib.pyplot.show()
-
-    # interface
-    def train(self):
-        dataQueue = multiprocessing.Queue(self.queueSize)
-
-        dataProcess = []
-        # start dataProcessor
-        for i in range(1):
-          dataProcess.append(multiprocessing.Process(target = self.dataProcessor, args = (dataQueue,)))
-          dataProcess[i].daemon = True
-          # dataProcess = threading.Thread(target = self.dataProcessor, args=(dataQueue,))
-          dataProcess[i].start()
-
-        caffe.set_device(0)
-        caffe.set_mode_gpu()
-        solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
-
-        # start trainProcessor in main process
-        self.trainProcessor(dataQueue, solver)
-
-if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/", "v3/", 4)
-    trainer.train()
+                        # print(dataQueue.qsize())

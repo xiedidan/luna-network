@@ -95,3 +95,7 @@ resnext/.idea
 
 # training output
 **/snapshot
+
+# net drawings
+**/*.png
+

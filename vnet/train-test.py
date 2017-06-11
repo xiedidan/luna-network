@@ -7,6 +7,7 @@ from glob import glob
 
 import NoduleCropper
 import NoduleSerializer
+from Plotter import Plotter
 
 import caffe
 import multiprocessing
@@ -39,19 +40,17 @@ class Train(object):
         caffe.set_mode_gpu()
 
         trainLoss = np.zeros(self.iterationCount)
-        plt.ion()
+        testAccu = np.zeros(self.iterationCount)
+        plotter = Plotter()
 
         solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
         for i in range(self.iterationCount):
             solver.step(1)
 
             trainLoss[i] = solver.net.blobs["dice_loss"].data
+            testAccu[i] = solver.test_nets[0].blobs["accuracy"].data
             if np.mod(i, 30) == 0:
-                plt.clf()
-                plt.grid(True)
-                plt.plot(range(0, i), trainLoss[0:i])
-                plt.pause(0.00000001)
-            matplotlib.pyplot.show()
+                plotter.plot(trainLoss, i, testAccu, i)
 
 if __name__ == "__main__":
     trainer = Train("d:/project/tianchi/data/", "v3/", 2)

@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "NpyDataLayer"
     layer: "NpyDataLayer"
-    param_str: "{\'shift_ratio\': 0.5, \'net_path\': \'v3/\', \'iter_count\': 100000, \'queue_size\': 30, \'phase\': \'test\', \'rotate_ratio\': 0.5, \'vol_size\': 64, \'data_path\': \'d:/project/tianchi/data/\', \'batch_size\': 2}"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.5, \'queue_size\': 30, \'phase\': \'test\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.5, \'net_path\': \'v3/\', \'batch_size\': 2}"
   }
 }
 layer {
@@ -72,7 +72,9 @@ layer {
     num_output: 16
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -96,7 +98,9 @@ layer {
     num_output: 16
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -116,6 +120,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -139,7 +144,9 @@ layer {
     num_output: 32
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -163,7 +170,9 @@ layer {
     num_output: 32
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -187,7 +196,9 @@ layer {
     num_output: 32
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -207,6 +218,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -230,7 +242,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -254,7 +268,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -278,7 +294,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -298,6 +316,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -321,7 +340,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -345,7 +366,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -369,7 +392,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -389,6 +414,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -419,7 +445,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -443,7 +471,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -467,7 +497,9 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -487,6 +519,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -517,7 +550,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -541,7 +576,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -565,7 +602,9 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -585,6 +624,7 @@ layer {
     pad: 0
     kernel_size: 2
     stride: 2
+    engine: CUDNN
   }
 }
 layer {
@@ -615,7 +655,9 @@ layer {
     num_output: 32
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -639,7 +681,9 @@ layer {
     num_output: 32
     pad: 1
     kernel_size: 3
+    group: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {
@@ -659,6 +703,7 @@ layer {
     pad: 0
     kernel_size: 1
     stride: 1
+    engine: CUDNN
   }
 }
 layer {

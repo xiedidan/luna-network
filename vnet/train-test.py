@@ -41,7 +41,7 @@ class Train(object):
 
         trainLoss = np.zeros(self.iterationCount)
         testAccu = np.zeros(self.iterationCount)
-        plotter = Plotter()
+        plt.ion()
 
         solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
         for i in range(self.iterationCount):
@@ -50,8 +50,13 @@ class Train(object):
             trainLoss[i] = solver.net.blobs["dice_loss"].data
             testAccu[i] = solver.test_nets[0].blobs["accuracy"].data
             if np.mod(i, 30) == 0:
-                plotter.plot(trainLoss, i, testAccu, i)
+                plt.clf()
+                plt.plot(range(0, i), trainLoss[0: i], 'b-', label='Loss', linewidth=1)
+                plt.pause(0.00000001)
+
+            matplotlib.pyplot.show()
+
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/", "v3/", 2)
+    trainer = Train("d:/project/tianchi/data/", "v1/", 4)
     trainer.train()

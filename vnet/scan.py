@@ -51,6 +51,7 @@ class Scanner(object):
 
         meta = {}
         meta["steps"] = steps
+        meta["shape"] = shape
         self.serializer.writeToNpy("meta/", seriesuid + ".npy", meta)
 
         for z in range(steps[0]):

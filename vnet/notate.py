@@ -18,21 +18,17 @@ import NoduleSerializer
 
 class Notate(object):
     # constuctor
-    def __init__(self, dataPath, phrase = "deploy", stepSize = 32):
+    def __init__(self, dataPath, phase = "deploy", stepSize = 32):
         self.dataPath = dataPath
-        self.phrase = phrase # test or deploy
-        self.phraseSubPath = self.phrase + "/"
+        self.phase = phase # test or deploy
+        self.phaseSubPath = self.phase + "/"
         self.stepSize = stepSize
         self.serializer = NoduleSerializer(self.dataPath)
         self.sqrt3 = sqrt(3.0)
 
     # helper
-    def calcWorldCoord(self, notations, origin, steps):
-        blockPosition = np.array([notations[0], notations[1], notations[2]]) # z, y, x
-
-        blockOrigin = steps * self.stepSize
-        position = blockOrigin + blockPosition
-
+    def calcWorldCoord(self, notations, origin):
+        position = np.array([notations[0], notations[1], notations[2]]) # z, y, x
         worldCoord = origin + position
 
         notations[0] = worldCoord[0]
@@ -50,14 +46,12 @@ class Notate(object):
 
     # interface
     def notate(self):
-        pathList = glob(self.dataPath)
+        pathList = glob(self.dataPath + self.phaseSubPath + "concat/")
         fileList = list(pathList.map(lambda path: os.path.basename(path)))
         for filename in enumerate(tqdm(fileList)):
-            id = filename.split(".")[0]
-            seriesuid = id.split("-")[0]
-            # number = int(id.split("-")[1])
+            seriesuid = filename.split("-")[0]
 
-            data = self.serializer.readFromNpy("results/", filename)
+            data = self.serializer.readFromNpy("concat/", filename)
             data = np.squeeze(data)
 
             # blob dectection
@@ -69,13 +63,10 @@ class Notate(object):
             notations = list(blobs.map(lambda blob: self.calcRadius(blob)))
 
             # convert to world coord
-            steps = self.serializer.readFromNpy(self.phrase + "/steps/", filename)
-
-            mhdFile = os.path.join(self.dataPath, self.phraseSubPath, seriesuid, ".mhd")
+            mhdFile = os.path.join(self.dataPath, self.phaseSubPath, seriesuid, ".mhd")
             rawImage = sitk.ReadImage(mhdFile)
             worldOrigin = np.array(rawImage.GetOrigin())[::-1]
-
-            notations = list(notations.map(lambda notations: self.calcWorldCoord(notations, worldOrigin, steps)))
+            notations = list(notations.map(lambda notations: self.calcWorldCoord(notations, worldOrigin)))
 
             # notation filter with lung mask
             mask = self.serializer.readFromNpy("mask/", filename)

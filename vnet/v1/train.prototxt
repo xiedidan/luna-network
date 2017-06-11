@@ -1,8 +1,14 @@
-input: "data"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
-
-input: "label"
-input_shape { dim: 4 dim: 1 dim: 64 dim: 64 dim: 64 }
+layer {
+  name: "data"
+  type: "Python"
+  top: "data"
+  top: "label"
+  python_param {
+    module: "NpyDataLayer"
+    layer: "NpyDataLayer"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.5, \'queue_size\': 30, \'phase\': \'train\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.5, \'net_path\': \'v1/\', \'batch_size\': 4}"
+  }
+}
 
 # Input block
 
@@ -703,55 +709,44 @@ layer {
 }
 
 layer {
-  name: "reshape_label"
-  type: "Reshape"
-  bottom: "label"
-  top: "label_flat"
-  reshape_param {
-    shape {
-      dim: 0  # copy the dimension from below
-      dim: 1
-      dim: -1 # this should be 262144
-    }
-  }
-}
-
-
-layer {
-  name: "reshape_result"
+  name: "flat_output"
   type: "Reshape"
   bottom: "conv_i64c2o64_output_1"
-  top: "result_flat"
+  top: "flat_output"
   reshape_param {
     shape {
-      dim: 0  # copy the dimension from below
+      dim: 0
       dim: 2
-      dim: -1 # this should be 262144
+      dim: -1
     }
   }
 }
 
 layer {
-  name: "softmax"
-  type: "Softmax"
-  bottom: "result_flat"
-  top: "softmax"
+  name: "flat_label"
+  type: "Reshape"
+  bottom: "label"
+  top: "flat_label"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 1
+      dim: -1
+    }
+  }
 }
 
 layer {
-  type: "DiceLoss"
-  name: "dice_loss"
-  top: "dice_loss"
-  bottom: "softmax"
-  bottom: "label_flat"
+  name: "softmax_output"
+  type: "Softmax"
+  bottom: "flat_output"
+  top: "softmax_output"
 }
 
-#layer {
-#  name: "dice_loss"
-#  type: "Python"
-#  bottom: "softmax"
-#  bottom: "label_flat"
-#  top: "dice"
-#  python_param { module: "diceLossLayer" layer: "DiceLoss" }
-#  loss_weight: 1
-#}
+layer {
+  name: "dice_loss"
+  type: "DiceLoss"
+  bottom: "softmax_output"
+  bottom: "flat_label"
+  top: "dice_loss"
+}

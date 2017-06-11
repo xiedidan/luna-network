@@ -49,6 +49,10 @@ class Scanner(object):
         steps = np.rint(np.ceil(shape / self.stepSize))
         steps = np.array(steps, dtype = int)
 
+        meta = {}
+        meta["steps"] = steps
+        self.serializer.writeToNpy("meta/", seriesuid + ".npy", meta)
+
         for z in range(steps[0]):
             for y in range(steps[1]):
                 for x in range(steps[2]):

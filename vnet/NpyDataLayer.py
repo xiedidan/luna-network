@@ -107,6 +107,15 @@ class BatchLoader(object):
         image /= std.astype(np.float32)
         return image
 
+    def randomizedHistogramShift(self, image, shiftRatio):
+
+        if np.random.random() < shiftRatio:
+            # shift +- 5%
+            shiftPercent = (np.random.random() - 0.5) / 10.0
+            image = image * (1.0 + shiftPercent)
+
+        return image
+
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
         groundTruth = sample["groundTruth"]
@@ -153,6 +162,7 @@ class BatchLoader(object):
             sample = sample[1]
             image = sample["image"]
             # image = self.setWindow(image)
+            image = self.randomizedHistogramShift(image, 0.5)
             image = self.normalize(image)
             sample["image"] = image
 

@@ -51,6 +51,7 @@ class BatchLoader(object):
         self.queueSize = params["queue_size"]
         self.shiftRatio = params["shift_ratio"]
         self.rotateRatio = params["rotate_ratio"]
+        self.histogramShiftRatio = params["histogram_shift_ratio"]
 
         self.dataPath = params["data_path"]
         self.netPath = params["net_path"]
@@ -107,14 +108,16 @@ class BatchLoader(object):
         image /= std.astype(np.float32)
         return image
 
-    def randomizedHistogramShift(self, image, shiftRatio):
+    def randomizedHistogramShift(self, sample, shiftRatio):
+        image = sample["image"]
 
         if np.random.random() < shiftRatio:
             # shift +- 5%
             shiftPercent = (np.random.random() - 0.5) / 10.0
             image = image * (1.0 + shiftPercent)
+            sample["image"] = image
 
-        return image
+        return sample
 
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
@@ -162,7 +165,6 @@ class BatchLoader(object):
             sample = sample[1]
             image = sample["image"]
             # image = self.setWindow(image)
-            image = self.randomizedHistogramShift(image, 0.5)
             image = self.normalize(image)
             sample["image"] = image
 
@@ -178,6 +180,7 @@ class BatchLoader(object):
                 # randomized cropping
                 if self.phase == "train":
                     sample = self.randomizedCrop(sample, self.rotateRatio, self.shiftRatio)
+                    sample = self.randomizedHistogramShift(sample, self.histogramShiftRatio)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
                         # print(dataQueue.qsize())

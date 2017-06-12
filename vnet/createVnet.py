@@ -118,19 +118,19 @@ def writeVnet(dataPath="d:/project/tianchi/data/", workPath="./vnet/", batchSize
 
     # train.prototxt
     with open("{0}train.prototxt".format(workPath), "w") as file:
-        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
         train = vnet(phase="train", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
         file.write(train)
 
     # test.prototxt
     with open("{0}test.prototxt".format(workPath), "w") as file:
-        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
         test = vnet(phase="test", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
         file.write(test)
 
     # deploy.prototxt
     with open("{0}deploy.prototxt".format(workPath), "w") as file:
-        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+        dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
         deploy = vnet(phase="deploy", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
         file.write(deploy)
 

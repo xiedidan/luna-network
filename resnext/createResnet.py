@@ -5,6 +5,7 @@ sys.path.append("../luna-data-pre-processing")
 from CaffeSolver import CaffeSolver
 
 import os
+import numpy as np
 
 import caffe
 
@@ -43,21 +44,21 @@ class ResNetCreator(object):
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
                                    phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
             train = self.create(phase="train", dataLayerParams=dataLayerParams)
-            file.write(train)
+            file.write("{0}".format(train))
 
         # test.prototxt
         with open("{0}test.prototxt".format(workPath), "w") as file:
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
                                    phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
             test = self.create(phase="test", dataLayerParams=dataLayerParams)
-            file.write(test)
+            file.write("{0}".format(test))
 
         # deploy.prototxt
         with open("{0}deploy.prototxt".format(workPath), "w") as file:
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
                                    phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
             deploy = self.create(phase="deploy", dataLayerParams=dataLayerParams)
-            file.write(deploy)
+            file.write("{0}".format(deploy))
 
     # helper
     def create(self, dataLayerParams,  phase = "train"):
@@ -69,8 +70,8 @@ class ResNetCreator(object):
                                      param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
         n.input_relu = L.ReLU(n.input_conv, in_place=True)
 
-        for i in len(self.stages):
-            for j in self.stages[i]:
+        for i in range(len(self.stages)):
+            for j in range(self.stages[i]):
                 stageString = self.resnetString
 
                 bottomString = 'n.input_relu'
@@ -78,7 +79,7 @@ class ResNetCreator(object):
                     bottomString = 'n.res{}_add'.format(str(sum(self.stages[:i]) + j))
 
                 exec(stageString.replace('(bottom)', bottomString).
-                      replace('(numOfOutput)', str(2 ** i * 64)).
+                      replace('(output)', str(2 ** i * 64)).
                       replace('(n)', str(sum(self.stages[:i]) + j + 1)))
 
         exec('n.pool_ave = L.Pooling(n.res{}_add, pool=P.Pooling.AVE, global_pooling=True)'.format(
@@ -91,10 +92,12 @@ class ResNetCreator(object):
         if phase == "train":
             n.loss = L.SoftmaxWithLoss(n.classifier, n.label)
         elif phase == "test":
-            n.accuracy_top1 = L.Accuracy(n.classifier, n.label, include=dict(phase=1))
-            n.accuracy_top5 = L.Accuracy(n.classifier, n.label, include=dict(phase=1), accuracy_param=dict(top_k=5))
+            n.softmax_out = L.Softmax(n.classifier)
+            n.accuracy_top1 = L.Accuracy(n.softmax_out, n.label, accuracy_param=dict(top_k=1, axis=1))
+            n.accuracy_top5 = L.Accuracy(n.softmax_out, n.label, accuracy_param=dict(top_k=5, axis=1))
         else: # deploy
-            n.result = L.Softmax(n.classifier, n.label)
+            n.softmax_out = L.Softmax(n.classifier)
+            n.result = L.ArgMax(n.softmax_out, argmax_param=dict(axis=1))
 
         return n.to_proto()
 
@@ -102,12 +105,12 @@ class ResNetCreator(object):
     def resnetBottleneckBlock(self, bottom, numOfOutput):
         bn1 = L.BatchNorm(bottom, use_global_stats=False, in_place=True)
         relu1 = L.ReLU(bn1, in_place=True)
-        conv1 = L.Convolution(relu1, num_output=numOfOutput / 4, kernel_size=1, stride=1, pad=0, bias_term=False,
+        conv1 = L.Convolution(relu1, num_output=int(round(numOfOutput / 4)), kernel_size=1, stride=1, pad=0, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
         bn2 = L.BatchNorm(conv1, use_global_stats=False, in_place=True)
         relu2 = L.ReLU(bn2, in_place=True)
-        conv2 = L.Convolution(relu2, num_output=numOfOutput / 4, kernel_size=3, stride=1, pad=1, bias_term=False,
+        conv2 = L.Convolution(relu2, num_output=int(round(numOfOutput / 4)), kernel_size=3, stride=1, pad=1, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
         bn3 = L.BatchNorm(conv2, use_global_stats=False, in_place=True)
@@ -136,5 +139,6 @@ class ResNetCreator(object):
         return bn1, relu1, conv1, bn2, relu2, conv2, add
 
 if __name__ == "__main__":
-    creator = ResNetCreator()
-    creator.write()
+    # update parameters here, to replace the default configs
+    creator = ResNetCreator(dataLayer="NpyDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2)
+    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_v1/", batchSize = 2)

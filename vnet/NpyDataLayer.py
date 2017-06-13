@@ -137,10 +137,10 @@ class BatchLoader(object):
 
         centerRange = [32, 96]
         if np.random.random() < shiftRatio:
-            # shift - we shift +-8 max along each axis
-            shiftx = np.random.randint(-8, 8)
-            shifty = np.random.randint(-8, 8)
-            shiftz = np.random.randint(-8, 8)
+            # shift - we shift +-24 max along each axis
+            shiftx = np.random.randint(-24, 24)
+            shifty = np.random.randint(-24, 24)
+            shiftz = np.random.randint(-24, 24)
             xRange = centerRange + [shiftx, shiftx]
             yRange = centerRange + [shifty, shifty]
             zRange = centerRange + [shiftz, shiftz]

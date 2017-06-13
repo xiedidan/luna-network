@@ -24,9 +24,11 @@ from tqdm import tqdm
 
 class Train(object):
     # constructor
-    def __init__(self, dataPath = "./", netPath = "v1/", batchSize = 2, iterationCount = 100000, queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", netPath = "v1/", batchSize = 2, snapshotPath = "snapshot/", snapshotFilename = "", iterationCount = 100000, queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.netPath = netPath
+        self.snapshotPath = snapshotPath
+        self.snapshotFilename = snapshotFilename
         self.phase = "train"
         self.phaseSubPath = self.phase + "/"
         self.iterationCount = iterationCount
@@ -49,14 +51,19 @@ class Train(object):
         ax2 = ax1.twinx()
 
         solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
+        if len(self.snapshotFilename) != 0:
+            solver.restore(self.netPath + self.snapshotPath + self.snapshotFilename)
+        baseIter = solver.iter
+
         for i in range(self.iterationCount):
             solver.step(1)
 
             trainLoss[i] = solver.net.blobs["dice_loss"].data
             testAccu[i] = solver.test_nets[0].blobs["accuracy"].data
+            print(testAccu[i])
             if np.mod(i, 30) == 0:
-                ax1.plot(range(0, i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
-                ax2.plot(range(0, i), testAccu[0:i], "g-", label="Accu", linewidth=1)
+                ax1.plot(range(baseIter, baseIter + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
+                ax2.plot(range(baseIter, baseIter + i), testAccu[0:i], "g-", label="Accu", linewidth=1)
                 # plt.show()
                 plt.pause(0.00000001)
                 plt.savefig(self.netPath + "loss-accu.png")
@@ -65,5 +72,5 @@ class Train(object):
 
 
 if __name__ == "__main__":
-    trainer = Train("d:/project/tianchi/data/", "v1/", 4)
+    trainer = Train("d:/project/tianchi/data/", "v1/", 4, snapshotFilename="")
     trainer.train()

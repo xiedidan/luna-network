@@ -59,8 +59,7 @@ class Train(object):
             solver.step(1)
 
             trainLoss[i] = solver.net.blobs["dice_loss"].data
-            testAccu[i] = solver.test_nets[0].blobs["accuracy"].data
-            print(testAccu[i])
+            testAccu[i] = solver.test_nets[0].blobs["dice_loss"].data
             if np.mod(i, 30) == 0:
                 ax1.plot(range(baseIter, baseIter + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
                 ax2.plot(range(baseIter, baseIter + i), testAccu[0:i], "g-", label="Accu", linewidth=1)

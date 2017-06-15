@@ -30,7 +30,7 @@ class ResNetCreator(object):
                     self.resnetBlock((bottom), numOfOutput=(output))"
 
     # interface
-    def write(self, dataPath = "d:/project/tianchi/data/", workPath = "resnet_idmap_v1/", batchSize = 2):
+    def write(self, dataPath = "d:/project/tianchi/data/", workPath = "resnext_idmap_v1/", batchSize = 2):
         if not os.path.isdir(workPath):
             os.makedirs(workPath)
 
@@ -110,7 +110,7 @@ class ResNetCreator(object):
 
         bn2 = L.BatchNorm(conv1, use_global_stats=False, in_place=False)
         relu2 = L.ReLU(bn2, in_place=False)
-        conv2 = L.Convolution(relu2, num_output=int(round(numOfOutput / 4)), kernel_size=3, stride=1, pad=1, bias_term=False,
+        conv2 = L.Convolution(relu2, num_output=int(round(numOfOutput / 4)), kernel_size=3, group=32, stride=1, pad=1, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
         bn3 = L.BatchNorm(conv2, use_global_stats=False, in_place=False)

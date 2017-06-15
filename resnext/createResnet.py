@@ -68,14 +68,14 @@ class ResNetCreator(object):
 
         n.input_conv = L.Convolution(n.data, num_output=16, kernel_size=1, stride=1, pad=1, bias_term=False,
                                      param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
-        n.input_relu = L.ReLU(n.input_conv, in_place=True)
+        n.input_relu = L.ReLU(n.input_conv, in_place=False)
 
         for i in range(len(self.stages)):
             for j in range(self.stages[i]):
                 stageString = self.resnetString
 
                 bottomString = 'n.input_relu'
-                if (i != 0) and (j != 0):
+                if (i != 0) or (j != 0):
                     bottomString = 'n.res{}_add'.format(str(sum(self.stages[:i]) + j))
 
                 exec(stageString.replace('(bottom)', bottomString).
@@ -103,18 +103,18 @@ class ResNetCreator(object):
 
     # bottleneck residual block
     def resnetBottleneckBlock(self, bottom, numOfOutput):
-        bn1 = L.BatchNorm(bottom, use_global_stats=False, in_place=True)
-        relu1 = L.ReLU(bn1, in_place=True)
+        bn1 = L.BatchNorm(bottom, use_global_stats=False, in_place=False)
+        relu1 = L.ReLU(bn1, in_place=False)
         conv1 = L.Convolution(relu1, num_output=int(round(numOfOutput / 4)), kernel_size=1, stride=1, pad=0, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
-        bn2 = L.BatchNorm(conv1, use_global_stats=False, in_place=True)
-        relu2 = L.ReLU(bn2, in_place=True)
+        bn2 = L.BatchNorm(conv1, use_global_stats=False, in_place=False)
+        relu2 = L.ReLU(bn2, in_place=False)
         conv2 = L.Convolution(relu2, num_output=int(round(numOfOutput / 4)), kernel_size=3, stride=1, pad=1, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
-        bn3 = L.BatchNorm(conv2, use_global_stats=False, in_place=True)
-        relu3 = L.ReLU(bn3, in_place=True)
+        bn3 = L.BatchNorm(conv2, use_global_stats=False, in_place=False)
+        relu3 = L.ReLU(bn3, in_place=False)
         conv3 = L.Convolution(relu3, num_output=numOfOutput, kernel_size=1, stride=1, pad=0, bias_term=False,
                               param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
 
@@ -141,4 +141,4 @@ class ResNetCreator(object):
 if __name__ == "__main__":
     # update parameters here, to replace the default configs
     creator = ResNetCreator(dataLayer="NpyDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2)
-    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_v1/", batchSize = 2)
+    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_v2/", batchSize = 2)

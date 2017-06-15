@@ -7,11 +7,11 @@ lr_policy: "step"
 max_iter: 100000
 momentum: 0.9
 snapshot: 500
-snapshot_prefix: "resnet_v1/snapshot/"
+snapshot_prefix: "resnet_v2/snapshot/"
 stepsize: 5000
 test_initialization: false
 test_interval: 500
 test_iter: 100
-test_net: "resnet_v1/test.prototxt"
-train_net: "resnet_v1/train.prototxt"
+test_net: "resnet_v2/test.prototxt"
+train_net: "resnet_v2/train.prototxt"
 weight_decay: 0.0005

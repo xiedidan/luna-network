@@ -11,6 +11,9 @@ from tqdm import tqdm
 from NoduleCropper import NoduleCropper
 from NoduleSerializer import NoduleSerializer
 
+import matplotlib.pyplot as plt
+import matplotlib
+
 # scan CTs by 32 stepsize, generate data queue
 # suppose CTs have already been re-sampled
 

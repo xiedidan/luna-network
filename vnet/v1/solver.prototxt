@@ -9,6 +9,6 @@ gamma: 0.7
 display: 10
 snapshot: 500
 test_initialization: false
-test_interval: 50
-test_iter: 1
+test_interval: 250
+test_iter: 5
 test_net: "v1/test.prototxt"

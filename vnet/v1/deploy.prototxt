@@ -698,13 +698,3 @@ layer {
     bias_filler { type: "constant" value: 0.0 }
   }
 }
-
-layer {
-  name: "argmax_output"
-  type: "ArgMax"
-  bottom: "conv_i64c2o64_output_1"
-  top: "argmax_output"
-  argmax_param {
-    axis: 1
-  }
-}

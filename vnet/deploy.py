@@ -24,7 +24,7 @@ import matplotlib
 
 class Depoly(object):
     # constructor
-    def __init__(self, dataPath = "./", netPath = "v1/", phase = "deploy", snapshot = "_iter_62000.caffemodel", queueSize = 32, volSize = 64):
+    def __init__(self, dataPath = "./", netPath = "v1/", phase = "deploy", snapshot = "_iter_10000.caffemodel", queueSize = 32, volSize = 64):
         self.dataPath = dataPath
         self.netPath = netPath
         self.phase = phase
@@ -47,14 +47,24 @@ class Depoly(object):
 
             out = net.forward()
 
-            labels = out["argmax_output"]
-            labels = np.rint(labels)
-            labels = np.squeeze(labels.astype(dtype=np.int8))
+            labels = out["conv_i64c2o64_output_1"]
+            labels = np.squeeze(labels)
+            output = labels[1] - labels[0]
+            # print(len(output[output < 0]))
+            output[output < 0] = 0.
+            # output[output > 0] = 1.
+
+            output = np.rint(output).astype(dtype=np.int8)
+
+            '''''''''
             fig = plt.figure()
-            ax = fig.add_subplot(221)
+            ax = fig.add_subplot(111)
             ax.imshow(labels[32])
+            plt.pause(0.00000001)
             plt.show()
-            serializer.writeToNpy("results/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), np.squeeze(labels))
+            '''
+
+            serializer.writeToNpy("results/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), output.astype(np.int8))
             # serializer.writeToNpy("steps/", "{0}-{1}.npy".format(crop["seriesuid"], crop["number"]), crop["steps"])
 
     # interface
@@ -68,9 +78,9 @@ class Depoly(object):
         caffe.set_device(0)
         caffe.set_mode_gpu()
 
-        net =caffe.Net(self.netPath + "deploy.prototxt", os.path.join(self.netPath, "./snapshot/", self.snapshot), caffe.TEST)
+        net =caffe.Net(self.netPath + "deploy.prototxt", os.path.join(self.netPath, "snapshot/", self.snapshot), caffe.TEST)
         self.testProcess(dataQueue, net, self.serializer)
 
 if __name__ == "__main__":
-    prophet = Depoly("d:/project/tianchi/data/", netPath = "v1/", snapshot = "_iter_62000.caffemodel")
+    prophet = Depoly("d:/project/tianchi/data/", netPath = "v1/", snapshot = "_iter_3000.caffemodel")
     prophet.speak()

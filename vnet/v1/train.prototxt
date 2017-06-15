@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "NpyDataLayer"
     layer: "NpyDataLayer"
-    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.5, \'queue_size\': 30, \'phase\': \'train\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.5, \'histogram_shift_ratio\': 0.3, \'net_path\': \'v1/\', \'batch_size\': 4}"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.95, \'queue_size\': 30, \'phase\': \'train\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.95, \'histogram_shift_ratio\': 0.5, \'net_path\': \'v1/\', \'batch_size\': 4}"
   }
 }
 

@@ -4,7 +4,7 @@ import sys
 sys.path.append("../luna-data-pre-processing")
 
 import os
-import glob
+from glob import glob
 import numpy as np
 from math import sqrt
 from functools import reduce
@@ -12,7 +12,9 @@ from skimage import feature, exposure
 import SimpleITK as sitk
 from tqdm import tqdm
 
-import NoduleSerializer
+from NoduleSerializer import NoduleSerializer
+import blobs_detection
+import plot
 
 # get nodule annotation from the output of vnet
 
@@ -23,7 +25,7 @@ class Notate(object):
         self.phase = phase # test or deploy
         self.phaseSubPath = self.phase + "/"
         self.stepSize = stepSize
-        self.serializer = NoduleSerializer(self.dataPath)
+        self.serializer = NoduleSerializer(self.dataPath, self.phase)
         self.sqrt3 = sqrt(3.0)
 
     # helper
@@ -41,37 +43,71 @@ class Notate(object):
         notation = blob
         notation[3] = self.sqrt3 * notation[3]
 
-    def filterNotation(self, notation, lungMask):
-        return lungMask[notation[0], notation[1], notation[2]] > 0.5
+        return notation
 
     # interface
     def notate(self):
-        pathList = glob(self.dataPath + self.phaseSubPath + "concat/")
-        fileList = list(pathList.map(lambda path: os.path.basename(path)))
-        for filename in enumerate(tqdm(fileList)):
-            seriesuid = filename.split("-")[0]
+        csvPath = self.dataPath + self.phaseSubPath + "csv/"
+        if not os.path.isdir(csvPath):
+            os.makedirs(csvPath)
+
+        with open(csvPath + "annotation.csv", "w") as file:
+            file.write("seriesuid,coordX,coordY,coordZ,diameter_mm\n")
+
+        with open(csvPath + "seriesuids.csv", "w") as file:
+            file.write("seriesuid\n")
+
+        pathList = glob(self.dataPath + self.phaseSubPath + "concat/*.npy")
+        for path in enumerate(tqdm(pathList)):
+            filename = os.path.basename(path[1])
+            seriesuid = filename.split(".")[0]
+            print(seriesuid)
 
             data = self.serializer.readFromNpy("concat/", filename)
             data = np.squeeze(data)
 
-            # blob dectection
-            # TODO : try different equalize and blob detect methods
-            data = exposure.equalize_hist(data)
-            blobs = feature.blob_dog(data, threshold = 0.3)
-
-            # get radius of blobs - now we have notation
-            notations = list(blobs.map(lambda blob: self.calcRadius(blob)))
-
-            # convert to world coord
-            mhdFile = os.path.join(self.dataPath, self.phaseSubPath, seriesuid, ".mhd")
-            rawImage = sitk.ReadImage(mhdFile)
-            worldOrigin = np.array(rawImage.GetOrigin())[::-1]
-            notations = list(notations.map(lambda notations: self.calcWorldCoord(notations, worldOrigin)))
-
             # notation filter with lung mask
             mask = self.serializer.readFromNpy("mask/", filename)
-            notations = list(notations.filter(lambda notation: self.filterNotation(notation, mask)))
+            data = data * mask
 
-            # TODO : write notations to annotation.csv
-            line = "{0},{1},{2},{3},{4}\n".format(seriesuid, notations[2], notations[1], notations[0], notations[3] * 2.0)
-            print(line)
+            # blob dectection
+            data = exposure.equalize_hist(data)
+            blobs = blobs_detection.blob_dog(data, threshold=0.3, min_sigma=self.sqrt3)
+            # blobs = feature.blob_dog(data, threshold = 0.3)
+            # blobs = feature.blob_log(data)
+            # blobs = feature.blob_doh(data)
+
+            # get radius of blobs - now we have notation
+            notations = np.zeros(blobs.shape)
+            for i in range(len(blobs)):
+                notations[i] = self.calcRadius(blobs[i])
+
+            print(notations)
+            print(len(notations))
+
+            # convert to world coord
+            mhdFile = os.path.join(self.dataPath, self.phaseSubPath, "raw/", seriesuid + ".mhd")
+            rawImage = sitk.ReadImage(mhdFile)
+            worldOrigin = np.array(rawImage.GetOrigin())[::-1]
+            for i in range(len(notations)):
+                notations[i] = self.calcWorldCoord(notations[i], worldOrigin)
+
+            # write notations to csv
+            csvPath = self.dataPath + self.phaseSubPath + "csv/"
+            if not os.path.isdir(csvPath):
+                os.makedirs(csvPath)
+
+            with open(csvPath + "annotation.csv", "w+") as file:
+                file.write("seriesuid,coordX,coordY,coordZ,diameter_mm\n")
+                for i in range(len(notations)):
+                    line = "{0},{1},{2},{3},{4}\n".format(seriesuid, notations[i][2], notations[i][1], notations[i][0], notations[i][3] * 2.0)
+                    file.write(line)
+
+            with open(csvPath + "seriesuids.csv", "w+") as file:
+                file.write("seriesuid")
+                for i in range(len(notations)):
+                    file.write(seriesuid)
+
+if __name__ == "__main__":
+    notater = Notate("d:/project/tianchi/data/experiment/", "deploy")
+    notater.notate()

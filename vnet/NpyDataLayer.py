@@ -12,6 +12,9 @@ import multiprocessing
 import numpy as np
 from tqdm import tqdm
 
+import matplotlib.pyplot as plt
+import matplotlib
+
 import caffe
 
 class NpyDataLayer(caffe.Layer):
@@ -135,15 +138,15 @@ class BatchLoader(object):
             image = np.transpose(image, rotate)
             groundTruth = np.transpose(groundTruth, rotate)
 
-        centerRange = [32, 96]
+        centerRange = np.array([32, 96])
         if np.random.random() < shiftRatio:
             # shift - we shift +-24 max along each axis
             shiftx = np.random.randint(-24, 24)
             shifty = np.random.randint(-24, 24)
             shiftz = np.random.randint(-24, 24)
-            xRange = centerRange + [shiftx, shiftx]
-            yRange = centerRange + [shifty, shifty]
-            zRange = centerRange + [shiftz, shiftz]
+            xRange = centerRange + np.array([shiftx, shiftx])
+            yRange = centerRange + np.array([shifty, shifty])
+            zRange = centerRange + np.array([shiftz, shiftz])
         else:
             xRange = centerRange
             yRange = centerRange

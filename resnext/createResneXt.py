@@ -30,7 +30,7 @@ class ResNetCreator(object):
                     self.resnetBlock((bottom), numOfOutput=(output))"
 
     # interface
-    def write(self, dataPath = "d:/project/tianchi/data/", workPath = "resnext_idmap_v1/", batchSize = 2):
+    def write(self, dataPath = "d:/project/tianchi/data/", workPath = "resnext_idmap_group_v1/", batchSize = 2):
         if not os.path.isdir(workPath):
             os.makedirs(workPath)
 
@@ -141,4 +141,4 @@ class ResNetCreator(object):
 if __name__ == "__main__":
     # update parameters here, to replace the default configs
     creator = ResNetCreator(dataLayer="NpyDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2)
-    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_v2/", batchSize = 2)
+    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnext_idmap_group_v1/", batchSize = 2)

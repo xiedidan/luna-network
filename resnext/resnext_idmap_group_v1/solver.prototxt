@@ -1,0 +1,17 @@
+average_loss: 25
+base_lr: 0.0001
+display: 10
+gamma: 0.7
+iter_size: 1
+lr_policy: "step"
+max_iter: 100000
+momentum: 0.9
+snapshot: 500
+snapshot_prefix: "resnext_idmap_group_v1/snapshot/"
+stepsize: 5000
+test_initialization: false
+test_interval: 500
+test_iter: 100
+test_net: "resnext_idmap_group_v1/test.prototxt"
+train_net: "resnext_idmap_group_v1/train.prototxt"
+weight_decay: 0.0005

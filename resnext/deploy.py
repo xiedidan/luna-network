@@ -27,7 +27,7 @@ def dataHandler(input, output, parameter):
 
 if __name__ == "__main__":
     dataPath = "d:/project/tianchi/data/"
-    netPath = "v1/"
+    netPath = "resnet_idmap_v1/"
     queueSize = 32
 
     # start data reader

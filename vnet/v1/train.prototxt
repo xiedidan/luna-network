@@ -744,9 +744,9 @@ layer {
 }
 
 layer {
-  name: "dice_loss"
+  name: "loss"
   type: "DiceLoss"
   bottom: "softmax_output"
   bottom: "flat_label"
-  top: "dice_loss"
+  top: "loss"
 }

@@ -737,11 +737,11 @@ layer {
 }
 
 layer {
-  name: "data"
+  name: "accu"
   type: "Python"
   bottom: "result_flat"
   bottom: "label_flat"
-  top: "dice_loss"
+  top: "accu"
   python_param {
     module: "DiceLayer"
     layer: "Dice"

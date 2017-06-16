@@ -17,7 +17,7 @@ import matplotlib
 
 import caffe
 
-class NpyDataLayer(caffe.Layer):
+class ResnetDataLayer(caffe.Layer):
     def setup(self, bottom, top):
         self.top_names = ["data", "label"]
 
@@ -29,9 +29,7 @@ class NpyDataLayer(caffe.Layer):
         self.batch_loader = BatchLoader(params)
 
         top[0].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
-        top[1].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
-
-        # print_info("NpyDataLayer", params)
+        top[1].reshape(self.batch_size, 1, 2)
 
     def forward(self, bottom, top):
         for i in range(self.batch_size):
@@ -52,7 +50,7 @@ class BatchLoader(object):
         self.volSize = params["vol_size"]
         self.iterationCount = params["iter_count"]
         self.queueSize = params["queue_size"]
-        self.shiftRatio = params["shift_ratio"]
+        self.shiftRatio = 0. # for resnet, we don't need to shift since it always checks nodule in the center
         self.rotateRatio = params["rotate_ratio"]
         self.histogramShiftRatio = params["histogram_shift_ratio"]
 
@@ -136,7 +134,8 @@ class BatchLoader(object):
             dir = np.random.randint(0, 4)
             rotate = rotateList[dir]
             image = np.transpose(image, rotate)
-            groundTruth = np.transpose(groundTruth, rotate)
+            # no need to rotate labels
+            # groundTruth = np.transpose(groundTruth, rotate)
 
         centerRange = np.array([32, 96])
         if np.random.random() < shiftRatio:
@@ -178,7 +177,6 @@ class BatchLoader(object):
                 # get random sample
                 noduleIndex = np.random.randint(0, len(samples) - 1)
                 sample = samples[noduleIndex]
-                # sample = samples[0]
 
                 # randomized cropping
                 if self.phase == "train":
@@ -186,4 +184,3 @@ class BatchLoader(object):
                     sample = self.randomizedHistogramShift(sample, self.histogramShiftRatio)
 
                 dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
-                        # print(dataQueue.qsize())

@@ -136,7 +136,7 @@ class Train(object):
                 [nodule, groundTruth] = dataQueue.get()
 
                 batchData[j, 0, :, :, :] = nodule.astype(dtype = np.float32)
-                groundTruth = np.array([groundTruth[0]])
+                groundTruth = np.array([groundTruth])
                 groundTruth = groundTruth.reshape((1, 1))
                 batchLabel[j, :, :] = groundTruth.astype(dtype = np.float32)
 

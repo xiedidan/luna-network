@@ -1,5 +1,5 @@
 # Enter your network definition here.
-# Use Shift+Enter to update the visualization.
+# resNet of 50 layers
 input: "data"
 input_shape { dim: 2 dim: 1 dim: 64 dim: 64 dim: 64 }
 

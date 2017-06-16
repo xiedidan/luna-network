@@ -1,5 +1,5 @@
-net: "./resnet.prototxt"
-snapshot_prefix: "./snapshot/"
+net: "./resnext_ori_v1/50-layer/train.prototxt"
+snapshot_prefix: "./resnext_ori_v1/50-layer/snapshot/"
 base_lr: 0.0001
 momentum: 0.9
 weight_decay: 0.0005

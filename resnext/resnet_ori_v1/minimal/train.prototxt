@@ -1,5 +1,5 @@
 # Enter your network definition here.
-# Use Shift+Enter to update the visualization.
+# ResNeXt of 3 layers convolution
 input: "data"
 input_shape { dim: 1 dim: 1 dim: 64 dim: 64 dim: 64 }
 

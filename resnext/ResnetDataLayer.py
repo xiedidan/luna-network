@@ -76,22 +76,30 @@ class BatchLoader(object):
         return nodule, groundTruth
 
     # helper
-    def loadSample(self, filename):
+    def loadSample(self, filename, type):
         serializer = NoduleSerializer.NoduleSerializer(self.dataPath, self.phase)
 
         sample = {}
-        image = serializer.readFromNpy("nodules/", filename)
-        groundTruth = serializer.readFromNpy("groundTruths/", filename)
-        sample["image"] = image
-        sample["groundTruth"] = groundTruth
+        if type == "nodule":
+            image = serializer.readFromNpy("nodules/", filename)
+            # directly generate groundTruth
+            groundTruth = np.array([0, 1])
+            sample["image"] = image
+            sample["groundTruth"] = groundTruth
+        else:
+            image = serializer.readFromNpy("false-positive/", filename)
+            # directly generate groundTruth
+            groundTruth = np.array([1, 0])
+            sample["image"] = image
+            sample["groundTruth"] = groundTruth
 
         return sample
 
-    def loadAllSamples(self, filenames):
+    def loadAllSamples(self, filenames, type):
         samples = []
         for filename in enumerate(tqdm(filenames)):
             filename = filename[1]
-            sample = self.loadSample(filename)
+            sample = self.loadSample(filename, type)
             samples.append(sample)
         return samples
 
@@ -122,7 +130,6 @@ class BatchLoader(object):
 
     def randomizedCrop(self, sample, rotateRatio, shiftRatio):
         image = sample["image"]
-        groundTruth = sample["groundTruth"]
 
         if np.random.random() < rotateRatio:
             # rotate - p(3, 3) - 1 possibles
@@ -137,31 +144,28 @@ class BatchLoader(object):
             # no need to rotate labels
             # groundTruth = np.transpose(groundTruth, rotate)
 
+        # no need to shift
         centerRange = np.array([32, 96])
-        if np.random.random() < shiftRatio:
-            # shift - we shift +-24 max along each axis
-            shiftx = np.random.randint(-24, 24)
-            shifty = np.random.randint(-24, 24)
-            shiftz = np.random.randint(-24, 24)
-            xRange = centerRange + np.array([shiftx, shiftx])
-            yRange = centerRange + np.array([shifty, shifty])
-            zRange = centerRange + np.array([shiftz, shiftz])
-        else:
-            xRange = centerRange
-            yRange = centerRange
-            zRange = centerRange
+        xRange = centerRange
+        yRange = centerRange
+        zRange = centerRange
 
         crop = {}
         crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
-        crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
+        crop["groundTruth"] = sample["groundTruth"]
         return crop
 
     def dataProcessor(self, dataQueue):
-        npyFileList = glob(self.dataPath + self.phaseSubPath + "nodules/*.npy")
-        npyFileList = map(lambda filePath: os.path.basename(filePath), npyFileList)
+        noduleFileList = glob(self.dataPath + self.phaseSubPath + "nodules/*.npy")
+        noduleFileList = map(lambda filePath: os.path.basename(filePath), noduleFileList)
+
+        fpFileList = glob(self.dataPath + self.phaseSubPath + "false-positive/*.npy")
+        fpFileList = map(lambda  filePath: os.path.basename(filePath), fpFileList)
 
         # load all samples
-        samples = self.loadAllSamples(npyFileList)
+        samples = self.loadAllSamples(noduleFileList, "nodule")
+        fpSamples = self.loadAllSamples(fpFileList, "false-positive")
+        samples = samples.extend(fpSamples)
 
         for sample in enumerate(tqdm(samples)):
             sample = sample[1]

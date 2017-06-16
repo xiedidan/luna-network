@@ -14,7 +14,7 @@ from caffe import params as P
 
 class ResNetCreator(object):
     # constructor
-    def __init__(self, dataLayer="NpyDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2):
+    def __init__(self, dataLayer="ResnetDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2):
         self.dataLayer = dataLayer
         self.bottleneck = bottleneck
         self.stages = stages
@@ -64,7 +64,7 @@ class ResNetCreator(object):
     def create(self, dataLayerParams,  phase = "train"):
         n = caffe.NetSpec()
 
-        n.data, n.label = L.Python(module="NpyDataLayer", layer=self.dataLayer, ntop=2, param_str=str(dataLayerParams))
+        n.data, n.label = L.Python(module="ResnetDataLayer", layer=self.dataLayer, ntop=2, param_str=str(dataLayerParams))
 
         n.input_conv = L.Convolution(n.data, num_output=16, kernel_size=1, stride=1, pad=1, bias_term=False,
                                      param=[dict(lr_mult=1, decay_mult=1)], weight_filler=dict(type="xavier"))
@@ -93,8 +93,7 @@ class ResNetCreator(object):
             n.loss = L.SoftmaxWithLoss(n.classifier, n.label)
         elif phase == "test":
             n.softmax_out = L.Softmax(n.classifier)
-            n.accuracy_top1 = L.Accuracy(n.softmax_out, n.label, accuracy_param=dict(top_k=1, axis=1))
-            n.accuracy_top5 = L.Accuracy(n.softmax_out, n.label, accuracy_param=dict(top_k=5, axis=1))
+            n.accu = L.Accuracy(n.softmax_out, n.label, accuracy_param=dict(top_k=1, axis=1))
         else: # deploy
             n.softmax_out = L.Softmax(n.classifier)
             n.result = L.ArgMax(n.softmax_out, argmax_param=dict(axis=1))
@@ -140,5 +139,5 @@ class ResNetCreator(object):
 
 if __name__ == "__main__":
     # update parameters here, to replace the default configs
-    creator = ResNetCreator(dataLayer="NpyDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2)
-    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_v2/", batchSize = 2)
+    creator = ResNetCreator(dataLayer="ResnetDataLayer", bottleneck = True, stages = [3, 4, 6, 3], classCount = 2)
+    creator.write(dataPath = "c:/project/tianchi/data/", workPath = "resnet_idmap_v1/", batchSize = 2)

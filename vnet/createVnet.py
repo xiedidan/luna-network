@@ -44,7 +44,7 @@ def resUnit3(bottom, kernelSize=3, numberOfOutput=16, stride=1, pad=1):
 def vnet(phase, dataLayer, dataLayerParams):
     net = caffe.NetSpec()
 
-    net.data, net.label = L.Python(module="NpyDataLayer", layer=dataLayer, ntop=2, param_str=str(dataLayerParams))
+    net.data, net.label = L.Python(module="VnetDataLayer", layer=dataLayer, ntop=2, param_str=str(dataLayerParams))
     # net.conv_input = L.Convolution(net.data, convolution_param={"engine": 2, "kernel_size": 1, "stride": 1, "num_output": 16, "pad": 0})
     net.split_input1, net.split_input2, net.split_input3, net.split_input4, net.split_input5, net.split_input6, net.split_input7, net.split_input8, net.split_input9, net.split_input10, net.split_input11, net.split_input12, net.split_input13, net.split_input14, net.split_input15, net.split_input16 = L.Split(net.data, ntop=16)
     net.concat_input = L.Concat(net.split_input1, net.split_input2, net.split_input3, net.split_input4, net.split_input5, net.split_input6, net.split_input7, net.split_input8, net.split_input9, net.split_input10, net.split_input11, net.split_input12, net.split_input13, net.split_input14, net.split_input15, net.split_input16)
@@ -97,11 +97,11 @@ def vnet(phase, dataLayer, dataLayerParams):
     net.softmax_output = L.Softmax(net.flat_output)
 
     if phase == "train":
-        net.dice_loss = L.DiceLoss(net.softmax_output, net.flat_label)
+        net.loss = L.DiceLoss(net.softmax_output, net.flat_label)
     elif phase == "test":
-        net.accuracy = L.Accuracy(net.softmax_output, net.flat_label)
+        net.accu = L.Accuracy(net.softmax_output, net.flat_label)
     elif phase == "deploy":
-        net.output = L.Argmax(net.softmax_output, argmax_param={"axis": 1})
+        net.result = L.Argmax(net.softmax_output, argmax_param={"axis": 1})
 
     return str(net.to_proto())
 
@@ -119,19 +119,19 @@ def writeVnet(dataPath="d:/project/tianchi/data/", workPath="./vnet/", batchSize
     # train.prototxt
     with open("{0}train.prototxt".format(workPath), "w") as file:
         dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
-        train = vnet(phase="train", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
+        train = vnet(phase="train", dataLayer="VnetDataLayer", dataLayerParams=dataLayerParams)
         file.write(train)
 
     # test.prototxt
     with open("{0}test.prototxt".format(workPath), "w") as file:
         dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
-        test = vnet(phase="test", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
+        test = vnet(phase="test", dataLayer="VnetDataLayer", dataLayerParams=dataLayerParams)
         file.write(test)
 
     # deploy.prototxt
     with open("{0}deploy.prototxt".format(workPath), "w") as file:
         dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize, phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
-        deploy = vnet(phase="deploy", dataLayer="NpyDataLayer", dataLayerParams=dataLayerParams)
+        deploy = vnet(phase="deploy", dataLayer="VnetDataLayer", dataLayerParams=dataLayerParams)
         file.write(deploy)
 
 if __name__ == "__main__":

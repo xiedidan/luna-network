@@ -42,21 +42,21 @@ class ResNetCreator(object):
         # train.prototxt
         with open("{0}train.prototxt".format(workPath), "w") as file:
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
-                                   phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+                                   phase="train", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
             train = self.create(phase="train", dataLayerParams=dataLayerParams)
             file.write("{0}".format(train))
 
         # test.prototxt
         with open("{0}test.prototxt".format(workPath), "w") as file:
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
-                                   phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+                                   phase="test", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
             test = self.create(phase="test", dataLayerParams=dataLayerParams)
             file.write("{0}".format(test))
 
         # deploy.prototxt
         with open("{0}deploy.prototxt".format(workPath), "w") as file:
             dataLayerParams = dict(data_path=dataPath, net_path=workPath, iter_count=100000, batch_size=batchSize,
-                                   phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5)
+                                   phase="deploy", queue_size=30, vol_size=64, shift_ratio=0.5, rotate_ratio=0.5, histogram_shift_ratio=0.3)
             deploy = self.create(phase="deploy", dataLayerParams=dataLayerParams)
             file.write("{0}".format(deploy))
 

@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("../luna-data-pre-processing")
-sys.path.append("../lib")
+sys.path.append("../common")
 from NoduleSerializer import NoduleSerializer
 from Prophet import Prophet
 

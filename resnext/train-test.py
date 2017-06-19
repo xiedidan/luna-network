@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import sys
-sys.path.append("../lib")
+sys.path.append("../common")
 from Teacher import Teacher
 
 if __name__ == "__main__":

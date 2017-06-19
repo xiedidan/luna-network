@@ -11,9 +11,9 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 import numpy as np
 import pandas as pd
+import SimpleITK as sitk
 from tqdm import tqdm
 
-# TODO : read vnet annotations on train / test data sets
 class FalsePositiveCreator(object):
     def __init__(self, dataPath, phase, volSize):
         self.dataPath = dataPath
@@ -45,10 +45,8 @@ class FalsePositiveCreator(object):
     # helper
     def checkInside(self, vnetCenter, labelCenter, labelDiameter):
         distance = np.linalg.norm(vnetCenter - labelCenter)
-        if distance >
-        return True
-
-    def cropAndWriteSample(self, center):
+        if distance > labelDiameter / 2.0:
+            return False
         return True
 
     def creatorProcessor(self, resampleFile):
@@ -56,21 +54,28 @@ class FalsePositiveCreator(object):
         resampleFilename = os.path.basename(resampleFile)
         image = self.serializer.readFromNpy("resample/", resampleFilename)
 
+        # read world origin from mhd file
+        seriesuid = resampleFilename.split(".")[0]
+        rawFilename = self.dataPath + self.phaseSubPath + "raw/" + seriesuid + ".mhd"
+        rawImage = sitk.ReadImage(rawFilename)
+        worldOrigin = np.array(rawImage.GetOrigin())[::-1]
+
         fileVnetNotations = self.vnetNotationDf[self.vnetNotationDf.file == resampleFilename]
         fileLabelNotations = self.labelNotationDf[self.labelNotationDf.file == resampleFilename]
-        fileFalsePositives = []
+        idx = 0
         for i, vnetNotation in fileVnetNotations:
             falsePositiveFlag = True
             for j, labelNotation in fileLabelNotations:
                 vnetCenter = np.array([vnetNotation.coordZ, vnetNotation.coordY, vnetNotation.coordX])
                 labelCenter = np.array([labelNotation.coordZ, labelNotation.coordY, labelNotation.coordX])
-                # TODO : check diameter name
                 labelDiameter = labelNotation.diameter_mm
                 if self.checkInside(vnetCenter, labelCenter, labelDiameter) == True:
                     falsePositiveFlag = False
                     break
             if falsePositiveFlag == True:
-                self.cropAndWriteSample(vnetCenter)
+                idx += 1
+                crop, minusFlag = self.cropper.cropSingleNodule(image, vnetCenter, worldOrigin, [1.0, 1.0, 1.0], self.volSize)
+                self.serializer.writeToNpy("false-positive/", "{0}-{1}.npy".format(seriesuid, idx), crop)
 
         self.progressBar.update(1)
         return True
@@ -84,5 +89,6 @@ class FalsePositiveCreator(object):
 
         self.progressBar.close()
 
-    # TODO : compare with annotations provided by doctor
-# TODO : output false-positive
+if __name__ == "__main__":
+    creator = FalsePositiveCreator("d:/project/tianchi/data/experiment/", "deploy", 64)
+    creator.create()

@@ -31,7 +31,7 @@ class Concat(object):
                     result = self.serializer.readFromNpy("results/", "{0}-{1}.npy".format(seriesuid, number))
                     result = result.astype(np.float32)
                     offset = np.array([z * self.stepSize, y * self.stepSize, x * self.stepSize])
-                    print("z: {0}, y: {1}, x: {2}".format(z, y, x))
+                    # print("z: {0}, y: {1}, x: {2}".format(z, y, x))
                     image[offset[0]:(offset[0] + self.volSize), offset[1]:(offset[1] + self.volSize), offset[2]:(offset[2] + self.volSize)] += result[:, :, :]
 
         crop = np.zeros(shape)
@@ -56,5 +56,5 @@ class Concat(object):
             self.serializer.writeToNpy("concat/", "{0}.npy".format(seriesuid), image.astype(np.int8))
 
 if __name__ == "__main__":
-    concator = Concat("d:/project/tianchi/data/experiment/", "deploy")
+    concator = Concat("d:/project/tianchi/data/", "test")
     concator.concatAllFile()

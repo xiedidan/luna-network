@@ -47,7 +47,7 @@ class Scanner(object):
 
     def scanSingleFile(self, filename):
         seriesuid = os.path.basename(filename).split(".")[0]
-        image = self.serializer.readFromNpy("nodules/", filename)
+        image = self.serializer.readFromNpy("resamples/", filename)
 
         shape = image.shape
         shape = np.array(shape, dtype = int)
@@ -76,9 +76,12 @@ class Scanner(object):
                     data["image"] = crop
 
                     self.dataQueue.put(data)
+                    if self.dataQueue.qsize() < 1:
+                        print("dataQueue.qsize reaches 0, please use more scanners.")
 
     # interface
     def scanAllFiles(self):
-        self.fileList = glob(self.dataPath + self.phaseSubPath + "nodules/*.npy")
+        self.fileList = glob(self.dataPath + self.phaseSubPath + "resamples/*.npy")
+        print(self.fileList)
         for file in enumerate(tqdm(self.fileList)):
             self.scanSingleFile(os.path.basename(file[1]))

@@ -47,7 +47,7 @@ class Notate(object):
 
     # interface
     def notate(self):
-        csvPath = self.dataPath + self.phaseSubPath + "csv/"
+        csvPath = self.dataPath + self.phaseSubPath + "vnet-csv/"
         if not os.path.isdir(csvPath):
             os.makedirs(csvPath)
 
@@ -61,7 +61,7 @@ class Notate(object):
         for path in enumerate(tqdm(pathList)):
             filename = os.path.basename(path[1])
             seriesuid = filename.split(".")[0]
-            print(seriesuid)
+            # print(seriesuid)
 
             data = self.serializer.readFromNpy("concat/", filename)
             data = np.squeeze(data)
@@ -82,8 +82,8 @@ class Notate(object):
             for i in range(len(blobs)):
                 notations[i] = self.calcRadius(blobs[i])
 
-            print(notations)
-            print(len(notations))
+            # print(notations)
+            # print(len(notations))
 
             # convert to world coord
             mhdFile = os.path.join(self.dataPath, self.phaseSubPath, "raw/", seriesuid + ".mhd")
@@ -109,5 +109,5 @@ class Notate(object):
                     file.write(seriesuid)
 
 if __name__ == "__main__":
-    notater = Notate("d:/project/tianchi/data/experiment/", "deploy")
+    notater = Notate("d:/project/tianchi/data/", "test")
     notater.notate()

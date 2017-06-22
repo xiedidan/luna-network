@@ -25,8 +25,8 @@ class FalsePositiveCreator(object):
         self.serializer = NoduleSerializer(self.dataPath, self.phase)
 
         self.resampleSubPath = "resample/"
-        self.resamplePath = self.dataPath + self.phaseSubPath + self.resamplePath
-        self.resampleFileList = glob(self.resamplePath + "*.npy")
+        self.resamplePath = self.dataPath + self.phaseSubPath + self.resampleSubPath
+        self.resampleFileList = glob(self.resampleSubPath + "*.npy")
 
         self.vnetNotationSubPath = "vnet-csv/"
         self.vnetNotationFile = self.dataPath + self.phaseSubPath + self.vnetNotationSubPath + "annotations.csv"
@@ -90,5 +90,5 @@ class FalsePositiveCreator(object):
         self.progressBar.close()
 
 if __name__ == "__main__":
-    creator = FalsePositiveCreator("d:/project/tianchi/data/experiment/", "deploy", 64)
+    creator = FalsePositiveCreator("d:/project/tianchi/data/", "test", 64)
     creator.create()

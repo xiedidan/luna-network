@@ -29,7 +29,7 @@ class VnetDataLayer(caffe.Layer):
         self.batch_loader = BatchLoader(params)
 
         top[0].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
-        top[1].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
+        top[1].reshape(self.batch_size, 1, self.vol_size / 2, self.vol_size / 2, self.vol_size / 2)
 
     def forward(self, bottom, top):
         for i in range(self.batch_size):
@@ -136,23 +136,23 @@ class BatchLoader(object):
             image = np.transpose(image, rotate)
             groundTruth = np.transpose(groundTruth, rotate)
 
-        centerRange = np.array([32, 96])
+        dataRange = np.array([32, 96])
         if np.random.random() < shiftRatio:
             # shift - we shift +-16 max along each axis
             shiftx = np.random.randint(-16, 16)
             shifty = np.random.randint(-16, 16)
             shiftz = np.random.randint(-16, 16)
-            xRange = centerRange + np.array([shiftx, shiftx])
-            yRange = centerRange + np.array([shifty, shifty])
-            zRange = centerRange + np.array([shiftz, shiftz])
+            xRange = dataRange + np.array([shiftx, shiftx])
+            yRange = dataRange + np.array([shifty, shifty])
+            zRange = dataRange + np.array([shiftz, shiftz])
         else:
-            xRange = centerRange
-            yRange = centerRange
-            zRange = centerRange
+            xRange = dataRange
+            yRange = dataRange
+            zRange = dataRange
 
         crop = {}
         crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
-        crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
+        crop["groundTruth"] = groundTruth[(zRange[0] + 16):(zRange[1] - 16), (yRange[0] + 16):(yRange[1] - 16), (xRange[0] + 16):(xRange[1] - 16)]
         return crop
 
     def dataProcessor(self, dataQueue):

@@ -29,14 +29,14 @@ class VnetDataLayer(caffe.Layer):
         self.batch_loader = BatchLoader(params)
 
         top[0].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
-        top[1].reshape(self.batch_size, 1, self.vol_size / 2, self.vol_size / 2, self.vol_size / 2)
+        top[1].reshape(self.batch_size, 1, int(round(self.vol_size / 2)), int(round(self.vol_size / 2)), int(round(self.vol_size / 2)))
 
     def forward(self, bottom, top):
         for i in range(self.batch_size):
             image, groundTruth = self.batch_loader.load()
 
-            top[0].data[i, ...] = image
-            top[1].data[i, ...] = groundTruth
+            top[0].data[i, 0, ...] = image
+            top[1].data[i, 0, ...] = groundTruth
 
     def reshape(self, bottom, top):
         pass
@@ -171,15 +171,25 @@ class BatchLoader(object):
 
         # crop on the fly since we want randomized input
         np.random.seed()
+        print(self.iterationCount)
         for i in range(self.iterationCount):
             for j in range(self.batchSize):
                 # get random sample
                 noduleIndex = np.random.randint(0, len(samples) - 1)
                 sample = samples[noduleIndex]
 
+                crop = {}
                 # randomized cropping
                 if self.phase == "train":
-                    sample = self.randomizedCrop(sample, self.rotateRatio, self.shiftRatio)
-                    sample = self.randomizedHistogramShift(sample, self.histogramShiftRatio)
+                    crop = self.randomizedCrop(sample, self.rotateRatio, self.shiftRatio)
+                    crop = self.randomizedHistogramShift(crop, self.histogramShiftRatio)
+                elif self.phase == "test":
+                    groundTruth = sample["groundTruth"]
+                    labelRange = np.array([int(round(self.volSize / 4)), int(round(self.volSize * 3 / 4))])
+                    crop["groundTruth"] = groundTruth[labelRange[0]:labelRange[1], labelRange[0]:labelRange[1], labelRange[0]:labelRange[1]]
+                    crop["image"] = sample["image"]
 
-                dataQueue.put(tuple((sample["image"], sample["groundTruth"])))
+                if crop["groundTruth"].shape[0] != 32:
+                    print("{0}, {1}, {2}, {3}, {4}".format(self.phase, noduleIndex, labelRange, crop["image"].shape, crop["groundTruth"].shape))
+                else:
+                    dataQueue.put(tuple((crop["image"], crop["groundTruth"])))

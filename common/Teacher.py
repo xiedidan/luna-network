@@ -6,6 +6,7 @@ sys.path.append("../luna-data-pre-processing")
 import caffe
 
 import numpy as np
+import multiprocessing
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -23,35 +24,49 @@ class Teacher(object):
         self.volSize = volSize
         self.queueSize = queueSize
 
-    # interface
-    def train(self):
-        caffe.set_device(0)
-        caffe.set_mode_gpu()
-
-        trainLoss = np.zeros(self.iterationCount)
-        testAccu = np.zeros(self.iterationCount)
-
+    #helper
+    def drawProcess(self, baseIter, dataQueue):
         plt.ion()
         fig = plt.figure()
         plt.grid(True)
         ax1 = fig.add_subplot(1, 1, 1)
         ax2 = ax1.twinx()
 
+        trainLoss = np.zeros(self.iterationCount)
+        testAccu = np.zeros(self.iterationCount)
+
+        for i in range(int(round((self.iterationCount - baseIter) / 10))):
+            loss, accu = dataQueue.get()
+            trainLoss[i] = loss
+            testAccu[i] = accu
+
+            if np.mod(i, 30) == 0:
+                ax1.plot(range(int(round(baseIter / 10)), int(round(baseIter / 10)) + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
+                ax2.plot(range(int(round(baseIter / 10)), int(round(baseIter / 10)) + i), testAccu[0:i], "g-", label="Accu", linewidth=1)
+                plt.pause(0.00000001)
+                plt.savefig(self.netPath + "loss-accu.png")
+
+            matplotlib.pyplot.show()
+
+    # interface
+    def train(self):
+        caffe.set_device(0)
+        caffe.set_mode_gpu()
+
         solver = caffe.SGDSolver(self.netPath + "solver.prototxt")
         if len(self.snapshotFilename) != 0:
             solver.restore(self.netPath + self.snapshotPath + self.snapshotFilename)
         baseIter = solver.iter
 
-        for i in range(self.iterationCount):
+        dataQueue = multiprocessing.Queue(4096)
+        drawProc = multiprocessing.Process(target=self.drawProcess, args=(baseIter, dataQueue))
+        drawProc.daemon = True
+        drawProc.start()
+
+        for i in range(self.iterationCount - baseIter):
             solver.step(1)
 
-            trainLoss[i] = solver.net.blobs["loss"].data
-            testAccu[i] = solver.test_nets[0].blobs["accu"].data
-            if np.mod(i, 30) == 0:
-                ax1.plot(range(baseIter, baseIter + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
-                ax2.plot(range(baseIter, baseIter + i), testAccu[0:i], "g-", label="Accu", linewidth=1)
-                # plt.show()
-                plt.pause(0.00000001)
-                plt.savefig(self.netPath + "loss-accu.png")
-
-            matplotlib.pyplot.show()
+            loss = solver.net.blobs["loss"].data
+            accu = solver.test_nets[0].blobs["accu"].data
+            if np.mod(i, 10) == 0:
+                dataQueue.put(tuple((loss, accu)))

@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "VnetDataLayer"
     layer: "VnetDataLayer"
-    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.5, \'queue_size\': 30, \'phase\': \'test\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.5, \'histogram_shift_ratio\': 0.3, \'net_path\': \'v1/\', \'batch_size\': 4}"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.5, \'queue_size\': 30, \'phase\': \'test\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.5, \'histogram_shift_ratio\': 0.3, \'net_path\': \'v2/\', \'batch_size\': 4}"
   }
 }
 
@@ -418,13 +418,9 @@ layer {
 }
 
 layer {
+  type: "DiceLoss"
   name: "accu"
-  type: "Python"
-  bottom: "softmax_output"
-  bottom: "label_flat"
   top: "accu"
-  python_param {
-    module: "DiceLayer"
-    layer: "Dice"
-  }
+  bottom: "softmax_output"
+  bottom: "reshape_label"
 }

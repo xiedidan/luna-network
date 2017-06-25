@@ -8,3 +8,7 @@ stepsize: 5000
 gamma: 0.7
 display: 10
 snapshot: 500
+test_initialization: false
+test_interval: 500
+test_iter: 1
+test_net: "v2/test.prototxt"

@@ -31,10 +31,10 @@ layer {
 }
 
 layer {
-  name: "conv_input_64_1"
+  name: "conv_input_64_a1"
   type: "Convolution"
   bottom: "conv_input_split"
-  top: "conv_input_64_1"
+  top: "conv_input_64_a1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -49,24 +49,24 @@ layer {
 }
 
 layer {
-  name: "bn_input_64_1"
+  name: "bn_input_64_a1"
   type: "BatchNorm"
-  bottom: "conv_input_64_1"
-  top: "bn_input_64_1"
+  bottom: "conv_input_64_a1"
+  top: "conv_input_64_a1"
 }
 
 layer {
-  name: "relu_input_64_1"
+  name: "relu_input_64_a1"
   type: "PReLU"
-  bottom: "bn_input_64_1"
-  top: "relu_input_64_1"
+  bottom: "conv_input_64_a1"
+  top: "conv_input_64_a1"
 }
 
 layer {
-  name: "conv_input_64_2"
+  name: "conv_input_64_a2"
   type: "Convolution"
-  bottom: "relu_input_64_1"
-  top: "conv_input_64_2"
+  bottom: "relu_input_64_a1"
+  top: "conv_input_64_a2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -82,24 +82,24 @@ layer {
 }
 
 layer {
-  name: "bn_input_64_2"
+  name: "bn_input_64_a2"
   type: "BatchNorm"
-  bottom: "conv_input_64_2"
-  top: "bn_input_64_2"
+  bottom: "conv_input_64_a2"
+  top: "conv_input_64_a2"
 }
 
 layer {
-  name: "relu_input_64_2"
+  name: "relu_input_64_a2"
   type: "PReLU"
-  bottom: "bn_input_64_2"
-  top: "relu_input_64_2"
+  bottom: "conv_input_64_a2"
+  top: "conv_input_64_a2"
 }
 
 layer {
-  name: "conv_input_64_3"
+  name: "conv_input_64_a3"
   type: "Convolution"
-  bottom: "relu_input_64_2"
-  top: "conv_input_64_3"
+  bottom: "relu_input_64_a2"
+  top: "conv_input_64_a3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -114,33 +114,33 @@ layer {
 }
 
 layer {
-  name: "bn_input_64_3"
+  name: "bn_input_64_a3"
   type: "BatchNorm"
-  bottom: "conv_input_64_3"
-  top: "bn_input_64_3"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_a3"
 }
 
 layer {
-  name: "add_input_64"
+  name: "add_input_64_a"
   type: "Eltwise"
   bottom: "conv_input_split"
-  bottom: "bn_input_64_3"
-  top: "add_input_64"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_a3"
   eltwise_param { operation: SUM }
 }
 
 layer {
-  name: "relu_add_input_64"
+  name: "relu_add_input_64_a"
   type: "PReLU"
-  bottom: "add_input_64"
-  top: "relu_add_input_64"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_a3"
 }
 
 # pooling
 layer {
   name: "conv_pooling_i64c128o32"
   type: "Convolution"
-  bottom: "relu_add_input_64"
+  bottom: "relu_add_input_64_a"
   top: "conv_pooling_i64c128o32"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -156,10 +156,10 @@ layer {
 }
 
 layer {
-  name: "conv_input_32_1"
+  name: "conv_input_32_a1"
   type: "Convolution"
   bottom: "conv_pooling_i64c128o32"
-  top: "conv_input_32_1"
+  top: "conv_input_32_a1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -174,24 +174,24 @@ layer {
 }
 
 layer {
-  name: "bn_input_32_1"
+  name: "bn_input_32_a1"
   type: "BatchNorm"
-  bottom: "conv_input_32_1"
-  top: "bn_input_32_1"
+  bottom: "conv_input_32_a1"
+  top: "bn_input_32_a1"
 }
 
 layer {
-  name: "relu_input_32_1"
+  name: "relu_input_32_a1"
   type: "PReLU"
-  bottom: "bn_input_32_1"
-  top: "relu_input_32_1"
+  bottom: "bn_input_32_a1"
+  top: "relu_input_32_a1"
 }
 
 layer {
-  name: "conv_input_32_2"
+  name: "conv_input_32_a2"
   type: "Convolution"
-  bottom: "relu_input_32_1"
-  top: "conv_input_32_2"
+  bottom: "relu_input_32_a1"
+  top: "conv_input_32_a2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -207,24 +207,24 @@ layer {
 }
 
 layer {
-  name: "bn_input_32_2"
+  name: "bn_input_32_a2"
   type: "BatchNorm"
-  bottom: "conv_input_32_2"
-  top: "bn_input_32_2"
+  bottom: "conv_input_32_a2"
+  top: "bn_input_32_a2"
 }
 
 layer {
-  name: "relu_input_32_2"
+  name: "relu_input_32_a2"
   type: "PReLU"
-  bottom: "bn_input_32_2"
-  top: "relu_input_32_2"
+  bottom: "bn_input_32_a2"
+  top: "relu_input_32_a2"
 }
 
 layer {
-  name: "conv_input_32_3"
+  name: "conv_input_32_a3"
   type: "Convolution"
-  bottom: "relu_input_32_2"
-  top: "conv_input_32_3"
+  bottom: "relu_input_32_a2"
+  top: "conv_input_32_a3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -239,26 +239,26 @@ layer {
 }
 
 layer {
-  name: "bn_input_32_3"
+  name: "bn_input_32_a3"
   type: "BatchNorm"
-  bottom: "conv_input_32_3"
-  top: "bn_input_32_3"
+  bottom: "conv_input_32_a3"
+  top: "bn_input_32_a3"
 }
 
 layer {
-  name: "add_input_32"
+  name: "add_input_32_a"
   type: "Eltwise"
   bottom: "conv_pooling_i64c128o32"
-  bottom: "bn_input_32_3"
-  top: "add_input_32"
+  bottom: "bn_input_32_3_a"
+  top: "add_input_32_a"
   eltwise_param { operation: SUM }
 }
 
 layer {
-  name: "relu_add_input_32"
+  name: "relu_add_input_32_a"
   type: "PReLU"
-  bottom: "add_input_32"
-  top: "relu_add_input_32"
+  bottom: "add_input_32_a"
+  top: "relu_add_input_32_a"
 }
 
 # pooling

@@ -30,6 +30,8 @@ layer {
   }
 }
 
+# 64 - stage a
+
 layer {
   name: "conv_input_64_a1"
   type: "Convolution"
@@ -155,6 +157,8 @@ layer {
   }
 }
 
+# 32 - stage a
+
 layer {
   name: "conv_input_32_a1"
   type: "Convolution"
@@ -177,20 +181,20 @@ layer {
   name: "bn_input_32_a1"
   type: "BatchNorm"
   bottom: "conv_input_32_a1"
-  top: "bn_input_32_a1"
+  top: "conv_input_32_a1"
 }
 
 layer {
   name: "relu_input_32_a1"
   type: "PReLU"
-  bottom: "bn_input_32_a1"
-  top: "relu_input_32_a1"
+  bottom: "conv_input_32_a1"
+  top: "conv_input_32_a1"
 }
 
 layer {
   name: "conv_input_32_a2"
   type: "Convolution"
-  bottom: "relu_input_32_a1"
+  bottom: "conv_input_32_a1"
   top: "conv_input_32_a2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -210,20 +214,20 @@ layer {
   name: "bn_input_32_a2"
   type: "BatchNorm"
   bottom: "conv_input_32_a2"
-  top: "bn_input_32_a2"
+  top: "conv_input_32_a2"
 }
 
 layer {
   name: "relu_input_32_a2"
   type: "PReLU"
-  bottom: "bn_input_32_a2"
-  top: "relu_input_32_a2"
+  bottom: "conv_input_32_a2"
+  top: "conv_input_32_a2"
 }
 
 layer {
   name: "conv_input_32_a3"
   type: "Convolution"
-  bottom: "relu_input_32_a2"
+  bottom: "conv_input_32_a2"
   top: "conv_input_32_a3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -242,23 +246,131 @@ layer {
   name: "bn_input_32_a3"
   type: "BatchNorm"
   bottom: "conv_input_32_a3"
-  top: "bn_input_32_a3"
+  top: "conv_input_32_a3"
 }
 
 layer {
   name: "add_input_32_a"
   type: "Eltwise"
   bottom: "conv_pooling_i64c128o32"
-  bottom: "bn_input_32_3_a"
-  top: "add_input_32_a"
+  bottom: "conv_input_32_a3"
+  top: "conv_input_32_a3"
   eltwise_param { operation: SUM }
 }
 
 layer {
   name: "relu_add_input_32_a"
   type: "PReLU"
-  bottom: "add_input_32_a"
-  top: "relu_add_input_32_a"
+  bottom: "conv_input_32_a3"
+  top: "conv_input_32_a3"
+}
+
+# 32 - stage b
+
+layer {
+  name: "conv_input_32_b1"
+  type: "Convolution"
+  bottom: "conv_input_32_a3"
+  top: "conv_input_32_b1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_32_b1"
+  type: "BatchNorm"
+  bottom: "conv_input_32_b1"
+  top: "conv_input_32_b1"
+}
+
+layer {
+  name: "relu_input_32_b1"
+  type: "PReLU"
+  bottom: "conv_input_32_b1"
+  top: "conv_input_32_b1"
+}
+
+layer {
+  name: "conv_input_32_b2"
+  type: "Convolution"
+  bottom: "conv_input_32_b1"
+  top: "conv_input_32_b2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    group: 16
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_32_b2"
+  type: "BatchNorm"
+  bottom: "conv_input_32_b2"
+  top: "conv_input_32_b2"
+}
+
+layer {
+  name: "relu_input_32_b2"
+  type: "PReLU"
+  bottom: "conv_input_32_b2"
+  top: "conv_input_32_b2"
+}
+
+layer {
+  name: "conv_input_32_b3"
+  type: "Convolution"
+  bottom: "conv_input_32_b2"
+  top: "conv_input_32_b3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 128
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_32_b3"
+  type: "BatchNorm"
+  bottom: "conv_input_32_b3"
+  top: "conv_input_32_b3"
+}
+
+layer {
+  name: "add_input_32_b"
+  type: "Eltwise"
+  bottom: "conv_input_32_a3"
+  bottom: "conv_input_32_b3"
+  top: "conv_input_32_b3"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "relu_bdd_input_32_b"
+  type: "PReLU"
+  bottom: "conv_input_32_b3"
+  top: "conv_input_32_b3"
 }
 
 # pooling

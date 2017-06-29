@@ -125,8 +125,8 @@ layer {
 layer {
   name: "add_input_64_a"
   type: "Eltwise"
-  bottom: "conv_input_split"
   bottom: "conv_input_64_a3"
+  bottom: "conv_input_split"
   top: "conv_input_64_a3"
   eltwise_param { operation: SUM }
 }
@@ -252,8 +252,8 @@ layer {
 layer {
   name: "add_input_32_a"
   type: "Eltwise"
-  bottom: "conv_pooling_i64c128o32"
   bottom: "conv_input_32_a3"
+  bottom: "conv_pooling_i64c128o32"
   top: "conv_input_32_a3"
   eltwise_param { operation: SUM }
 }
@@ -360,8 +360,8 @@ layer {
 layer {
   name: "add_input_32_b"
   type: "Eltwise"
-  bottom: "conv_input_32_a3"
   bottom: "conv_input_32_b3"
+  bottom: "conv_input_32_a3"
   top: "conv_input_32_b3"
   eltwise_param { operation: SUM }
 }
@@ -490,8 +490,8 @@ layer {
 layer {
   name: "add_vally_a"
   type: "Eltwise"
-  bottom: "conv_pooling_i32c256o16"
   bottom: "conv_vally_a3"
+  bottom: "conv_pooling_i32c256o16"
   top: "conv_vally_a3"
   eltwise_param { operation: SUM }
 }
@@ -598,8 +598,8 @@ layer {
 layer {
   name: "add_vally_b"
   type: "Eltwise"
-  bottom: "conv_vally_a3"
   bottom: "conv_vally_b3"
+  bottom: "conv_vally_a3"
   top: "conv_vally_b3"
   eltwise_param { operation: SUM }
 }
@@ -706,8 +706,8 @@ layer {
 layer {
   name: "add_vally_c"
   type: "Eltwise"
-  bottom: "conv_vally_b3"
   bottom: "conv_vally_c3"
+  bottom: "conv_vally_b3"
   top: "conv_vally_c3"
   eltwise_param { operation: SUM }
 }
@@ -863,8 +863,8 @@ layer {
 layer {
   name: "add_output_32_a"
   type: "Eltwise"
-  bottom: "conv_concat_i32c128o32"
   bottom: "conv_output_32_a3"
+  bottom: "conv_concat_i32c128o32"
   top: "conv_output_32_a3"
   eltwise_param { operation: SUM }
 }
@@ -971,8 +971,8 @@ layer {
 layer {
   name: "add_output_32_b"
   type: "Eltwise"
-  bottom: "conv_concat_i32c128o32"
   bottom: "conv_output_32_b3"
+  bottom: "conv_concat_i32c128o32"
   top: "conv_output_32_b3"
   eltwise_param { operation: SUM }
 }
@@ -1124,8 +1124,8 @@ layer {
 layer {
   name: "add_output_64_a"
   type: "Eltwise"
-  bottom: "conv_concat_i64c16o64"
   bottom: "conv_output_64_a3"
+  bottom: "conv_concat_i64c16o64"
   top: "conv_output_64_a3"
   eltwise_param { operation: SUM }
 }

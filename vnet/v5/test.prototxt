@@ -6,19 +6,19 @@ layer {
   python_param {
     module: "VnetDataLayer"
     layer: "VnetDataLayer"
-    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.0, \'queue_size\': 30, \'phase\': \'test\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.0, \'histogram_shift_ratio\': 0.0, \'net_path\': \'v5/\', \'batch_size\': 2}"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.0, \'queue_size\': 30, \'phase\': \'test\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.0, \'histogram_shift_ratio\': 0.0, \'net_path\': \'v5/\', \'batch_size\': 1}"
   }
 }
 
-# input
+# input - splitter, does not learn
 
 layer {
   name: "conv_input_split"
   type: "Convolution"
   bottom: "data"
   top: "conv_input_split"
-  param { lr_mult: 1.0 decay_mult: 1.0 }
-  param { lr_mult: 2.0 decay_mult: 0.0 }
+  param { lr_mult: 0.0 decay_mult: 0.0 }
+  param { lr_mult: 0.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
     num_output: 16
@@ -58,6 +58,16 @@ layer {
 }
 
 layer {
+  name: "scl_input_64_a1"
+  type: "Scale"
+  bottom: "conv_input_64_a1"
+  top: "conv_input_64_a1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_input_64_a1"
   type: "PReLU"
   bottom: "conv_input_64_a1"
@@ -88,6 +98,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_input_64_a2"
   top: "conv_input_64_a2"
+}
+
+layer {
+  name: "scl_input_64_a2"
+  type: "Scale"
+  bottom: "conv_input_64_a2"
+  top: "conv_input_64_a2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -132,17 +152,165 @@ layer {
 }
 
 layer {
+  name: "scl_input_64_a"
+  type: "Scale"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_a3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_input_64_a"
   type: "PReLU"
   bottom: "conv_input_64_a3"
   top: "conv_input_64_a3"
 }
 
+# 64 - stage b
+
+layer {
+  name: "conv_input_64_b1"
+  type: "Convolution"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_b1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 8
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_64_b1"
+  type: "BatchNorm"
+  bottom: "conv_input_64_b1"
+  top: "conv_input_64_b1"
+}
+
+layer {
+  name: "scl_input_64_b1"
+  type: "Scale"
+  bottom: "conv_input_64_b1"
+  top: "conv_input_64_b1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_input_64_b1"
+  type: "PReLU"
+  bottom: "conv_input_64_b1"
+  top: "conv_input_64_b1"
+}
+
+layer {
+  name: "conv_input_64_b2"
+  type: "Convolution"
+  bottom: "conv_input_64_b1"
+  top: "conv_input_64_b2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 8
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    group: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_64_b2"
+  type: "BatchNorm"
+  bottom: "conv_input_64_b2"
+  top: "conv_input_64_b2"
+}
+
+layer {
+  name: "scl_input_64_b2"
+  type: "Scale"
+  bottom: "conv_input_64_b2"
+  top: "conv_input_64_b2"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_input_64_b2"
+  type: "PReLU"
+  bottom: "conv_input_64_b2"
+  top: "conv_input_64_b2"
+}
+
+layer {
+  name: "conv_input_64_b3"
+  type: "Convolution"
+  bottom: "conv_input_64_b2"
+  top: "conv_input_64_b3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 16
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_input_64_b3"
+  type: "BatchNorm"
+  bottom: "conv_input_64_b3"
+  top: "conv_input_64_b3"
+}
+
+layer {
+  name: "add_input_64_b"
+  type: "Eltwise"
+  bottom: "conv_input_64_b3"
+  bottom: "conv_input_64_a3"
+  top: "conv_input_64_b3"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "scl_input_64_b"
+  type: "Scale"
+  bottom: "conv_input_64_b3"
+  top: "conv_input_64_b3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_add_input_64_b"
+  type: "PReLU"
+  bottom: "conv_input_64_b3"
+  top: "conv_input_64_b3"
+}
+
 # pooling
 layer {
   name: "conv_pooling_i64c128o32"
   type: "Convolution"
-  bottom: "conv_input_64_a3"
+  bottom: "conv_input_64_b3"
   top: "conv_pooling_i64c128o32"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -185,6 +353,16 @@ layer {
 }
 
 layer {
+  name: "scl_input_32_a1"
+  type: "Scale"
+  bottom: "conv_input_32_a1"
+  top: "conv_input_32_a1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_input_32_a1"
   type: "PReLU"
   bottom: "conv_input_32_a1"
@@ -215,6 +393,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_input_32_a2"
   top: "conv_input_32_a2"
+}
+
+layer {
+  name: "scl_input_32_a2"
+  type: "Scale"
+  bottom: "conv_input_32_a2"
+  top: "conv_input_32_a2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -259,6 +447,16 @@ layer {
 }
 
 layer {
+  name: "scl_input_32_a"
+  type: "Scale"
+  bottom: "conv_input_32_a3"
+  top: "conv_input_32_a3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_input_32_a"
   type: "PReLU"
   bottom: "conv_input_32_a3"
@@ -293,6 +491,16 @@ layer {
 }
 
 layer {
+  name: "scl_input_32_b1"
+  type: "Scale"
+  bottom: "conv_input_32_b1"
+  top: "conv_input_32_b1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_input_32_b1"
   type: "PReLU"
   bottom: "conv_input_32_b1"
@@ -323,6 +531,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_input_32_b2"
   top: "conv_input_32_b2"
+}
+
+layer {
+  name: "scl_input_32_b2"
+  type: "Scale"
+  bottom: "conv_input_32_b2"
+  top: "conv_input_32_b2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -364,6 +582,16 @@ layer {
   bottom: "conv_input_32_a3"
   top: "conv_input_32_b3"
   eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "scl_input_32_b"
+  type: "Scale"
+  bottom: "conv_input_32_b3"
+  top: "conv_input_32_b3"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -423,6 +651,16 @@ layer {
 }
 
 layer {
+  name: "scl_vally_a1"
+  type: "Scale"
+  bottom: "conv_vally_a1"
+  top: "conv_vally_a1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_vally_a1"
   type: "PReLU"
   bottom: "conv_vally_a1"
@@ -453,6 +691,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_vally_a2"
   top: "conv_vally_a2"
+}
+
+layer {
+  name: "scl_vally_a2"
+  type: "Scale"
+  bottom: "conv_vally_a2"
+  top: "conv_vally_a2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -497,6 +745,16 @@ layer {
 }
 
 layer {
+  name: "scl_vally_a"
+  type: "Scale"
+  bottom: "conv_vally_a3"
+  top: "conv_vally_a3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_vally_a"
   type: "PReLU"
   bottom: "conv_vally_a3"
@@ -531,6 +789,16 @@ layer {
 }
 
 layer {
+  name: "scl_vally_b1"
+  type: "Scale"
+  bottom: "conv_vally_b1"
+  top: "conv_vally_b1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_vally_b1"
   type: "PReLU"
   bottom: "conv_vally_b1"
@@ -561,6 +829,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_vally_b2"
   top: "conv_vally_b2"
+}
+
+layer {
+  name: "scl_vally_b2"
+  type: "Scale"
+  bottom: "conv_vally_b2"
+  top: "conv_vally_b2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -605,6 +883,16 @@ layer {
 }
 
 layer {
+  name: "scl_vally_b"
+  type: "Scale"
+  bottom: "conv_vally_b3"
+  top: "conv_vally_b3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_vally_b"
   type: "PReLU"
   bottom: "conv_vally_b3"
@@ -639,6 +927,16 @@ layer {
 }
 
 layer {
+  name: "scl_vally_c1"
+  type: "Scale"
+  bottom: "conv_vally_c1"
+  top: "conv_vally_c1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_vally_c1"
   type: "PReLU"
   bottom: "conv_vally_c1"
@@ -669,6 +967,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_vally_c2"
   top: "conv_vally_c2"
+}
+
+layer {
+  name: "scl_vally_c2"
+  type: "Scale"
+  bottom: "conv_vally_c2"
+  top: "conv_vally_c2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -710,6 +1018,16 @@ layer {
   bottom: "conv_vally_b3"
   top: "conv_vally_c3"
   eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "scl_vally_c"
+  type: "Scale"
+  bottom: "conv_vally_c3"
+  top: "conv_vally_c3"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -796,6 +1114,16 @@ layer {
 }
 
 layer {
+  name: "scl_output_32_a1"
+  type: "Scale"
+  bottom: "conv_output_32_a1"
+  top: "conv_output_32_a1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_output_32_a1"
   type: "PReLU"
   bottom: "conv_output_32_a1"
@@ -826,6 +1154,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_output_32_a2"
   top: "conv_output_32_a2"
+}
+
+layer {
+  name: "scl_output_32_a2"
+  type: "Scale"
+  bottom: "conv_output_32_a2"
+  top: "conv_output_32_a2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -870,6 +1208,16 @@ layer {
 }
 
 layer {
+  name: "scl_output_32_a"
+  type: "Scale"
+  bottom: "conv_output_32_a3"
+  top: "conv_output_32_a3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_output_32_a"
   type: "PReLU"
   bottom: "conv_output_32_a3"
@@ -904,6 +1252,16 @@ layer {
 }
 
 layer {
+  name: "scl_output_32_b1"
+  type: "Scale"
+  bottom: "conv_output_32_b1"
+  top: "conv_output_32_b1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_output_32_b1"
   type: "PReLU"
   bottom: "conv_output_32_b1"
@@ -934,6 +1292,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_output_32_b2"
   top: "conv_output_32_b2"
+}
+
+layer {
+  name: "scl_output_32_b2"
+  type: "Scale"
+  bottom: "conv_output_32_b2"
+  top: "conv_output_32_b2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -972,9 +1340,19 @@ layer {
   name: "add_output_32_b"
   type: "Eltwise"
   bottom: "conv_output_32_b3"
-  bottom: "conv_concat_i32c128o32"
+  bottom: "conv_output_32_a3"
   top: "conv_output_32_b3"
   eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "scl_output_32_b"
+  type: "Scale"
+  bottom: "conv_output_32_b3"
+  top: "conv_output_32_b3"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -987,15 +1365,15 @@ layer {
 # depooling
 
 layer {
-  name: "deconv_depooling_i32c16o64"
+  name: "deconv_depooling_i32c32o64"
   type: "Deconvolution"
   bottom: "conv_output_32_b3"
-  top: "deconv_depooling_i32c16o64"
+  top: "deconv_depooling_i32c32o64"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
     engine: CUDNN
-    num_output: 16
+    num_output: 32
     kernel_size: 2
     pad: 0
     stride: 2
@@ -1007,8 +1385,8 @@ layer {
 layer {
   name: "concat_output"
   type: "Concat"
-  bottom: "conv_input_64_a3"
-  bottom: "deconv_depooling_i32c16o64"
+  bottom: "conv_input_64_b3"
+  bottom: "deconv_depooling_i32c32o64"
   top: "concat_output_64"
   concat_param { axis: 1 }
 }
@@ -1030,6 +1408,8 @@ layer {
     bias_filler { type: "constant" value: 0.0 }
   }
 }
+
+# 64 - stage a
 
 layer {
   name: "conv_output_64_a1"
@@ -1054,6 +1434,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_output_64_a1"
   top: "conv_output_64_a1"
+}
+
+layer {
+  name: "scl_output_64_a1"
+  type: "Scale"
+  bottom: "conv_output_64_a1"
+  top: "conv_output_64_a1"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -1087,6 +1477,16 @@ layer {
   type: "BatchNorm"
   bottom: "conv_output_64_a2"
   top: "conv_output_64_a2"
+}
+
+layer {
+  name: "scl_output_64_a2"
+  type: "Scale"
+  bottom: "conv_output_64_a2"
+  top: "conv_output_64_a2"
+  scale_param {
+    bias_term: true
+  }
 }
 
 layer {
@@ -1131,16 +1531,164 @@ layer {
 }
 
 layer {
+  name: "scl_output_64_a"
+  type: "Scale"
+  bottom: "conv_output_64_a3"
+  top: "conv_output_64_a3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
   name: "relu_add_output_64_a"
   type: "PReLU"
   bottom: "conv_output_64_a3"
   top: "conv_output_64_a3"
 }
 
+# 64 - stage b
+
+layer {
+  name: "conv_output_64_b1"
+  type: "Convolution"
+  bottom: "conv_output_64_a3"
+  top: "conv_output_64_b1"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 8
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_output_64_b1"
+  type: "BatchNorm"
+  bottom: "conv_output_64_b1"
+  top: "conv_output_64_b1"
+}
+
+layer {
+  name: "scl_output_64_b1"
+  type: "Scale"
+  bottom: "conv_output_64_b1"
+  top: "conv_output_64_b1"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_output_64_b1"
+  type: "PReLU"
+  bottom: "conv_output_64_b1"
+  top: "conv_output_64_b1"
+}
+
+layer {
+  name: "conv_output_64_b2"
+  type: "Convolution"
+  bottom: "conv_output_64_b1"
+  top: "conv_output_64_b2"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 8
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    group: 2
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_output_64_b2"
+  type: "BatchNorm"
+  bottom: "conv_output_64_b2"
+  top: "conv_output_64_b2"
+}
+
+layer {
+  name: "scl_output_64_b2"
+  type: "Scale"
+  bottom: "conv_output_64_b2"
+  top: "conv_output_64_b2"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_output_64_b2"
+  type: "PReLU"
+  bottom: "conv_output_64_b2"
+  top: "conv_output_64_b2"
+}
+
+layer {
+  name: "conv_output_64_b3"
+  type: "Convolution"
+  bottom: "conv_output_64_b2"
+  top: "conv_output_64_b3"
+  param { lr_mult: 1.0 decay_mult: 1.0 }
+  param { lr_mult: 2.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 16
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "msra" variance_norm: 2 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
+}
+
+layer {
+  name: "bn_output_64_b3"
+  type: "BatchNorm"
+  bottom: "conv_output_64_b3"
+  top: "conv_output_64_b3"
+}
+
+layer {
+  name: "add_output_64_b"
+  type: "Eltwise"
+  bottom: "conv_output_64_b3"
+  bottom: "conv_output_64_a3"
+  top: "conv_output_64_b3"
+  eltwise_param { operation: SUM }
+}
+
+layer {
+  name: "scl_output_64_b"
+  type: "Scale"
+  bottom: "conv_output_64_b3"
+  top: "conv_output_64_b3"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "relu_add_output_64_b"
+  type: "PReLU"
+  bottom: "conv_output_64_b3"
+  top: "conv_output_64_b3"
+}
+
 layer {
   name: "crop_output"
   type: "Crop"
-  bottom: "conv_output_64_a3"
+  bottom: "conv_output_64_b3"
   bottom: "label"
   top: "crop_output"
   crop_param: {
@@ -1151,10 +1699,10 @@ layer {
 # 1 * 1 * 1 conv
 
 layer {
-  name: "conv_i32c2o32_output_4"
+  name: "conv_i32c2o32_output"
   type: "Convolution"
   bottom: "crop_output"
-  top: "conv_i32c2o32_output_4"
+  top: "conv_i32c2o32_output"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
   convolution_param {
@@ -1171,14 +1719,14 @@ layer {
 layer {
   name: "relu_output"
   type: "ReLU"
-  bottom: "conv_i32c2o32_output_4"
-  top: "conv_i32c2o32_output_4"
+  bottom: "conv_i32c2o32_output"
+  top: "conv_i32c2o32_output"
 }
 
 layer {
   name: "reshape_output"
   type: "Reshape"
-  bottom: "conv_i32c2o32_output_4"
+  bottom: "conv_i32c2o32_output"
   top: "reshape_output"
   reshape_param {
     shape {

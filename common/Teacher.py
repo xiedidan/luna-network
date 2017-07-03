@@ -35,15 +35,17 @@ class Teacher(object):
         trainLoss = np.zeros(self.iterationCount)
         testAccu = np.zeros(self.iterationCount)
 
-        for i in range(int(round((self.iterationCount - baseIter) / 10))):
+        for i in range(self.iterationCount - baseIter):
             loss, accu = dataQueue.get()
             trainLoss[i] = loss
             testAccu[i] = accu
 
-            if np.mod(i, 30) == 0:
-                ax1.plot(range(int(round(baseIter / 10)), int(round(baseIter / 10)) + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
-                ax2.plot(range(int(round(baseIter / 10)), int(round(baseIter / 10)) + i), testAccu[0:i], "g-", label="Accu", linewidth=1)
+            if np.mod(i, 300) == 0:
+                ax1.plot(range(baseIter, baseIter + i), trainLoss[0:i], "b-", label="Loss", linewidth=1)
+                ax2.plot(range(baseIter, baseIter + i), testAccu[0:i], "g-", label="Accu", linewidth=1)
                 plt.pause(0.00000001)
+
+            if np.mod(i, 1200) == 0:
                 plt.savefig(self.netPath + "loss-accu.png")
 
             matplotlib.pyplot.show()
@@ -68,5 +70,5 @@ class Teacher(object):
 
             loss = solver.net.blobs["loss"].data
             accu = solver.test_nets[0].blobs["accu"].data
-            if np.mod(i, 10) == 0:
-                dataQueue.put(tuple((loss, accu)))
+            dataQueue.put(tuple((loss, accu)))
+            print("dataQueue.length: {0}".format(dataQueue.qsize()))

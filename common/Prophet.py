@@ -28,8 +28,11 @@ class Prophet(object):
             input = {}
             for i in range(self.batchSize):
                 crop = dataQueue.get()
-                input[i] = crop
-                net.blobs["data"].data[i, 0, :, :, :] = crop["image"].astype(dtype = np.float32)
+                if crop["finishFlag"] == False:
+                    input[i] = crop
+                    net.blobs["data"].data[i, 0, :, :, :] = crop["image"].astype(dtype = np.float32)
+                else:
+                    return
 
             out = net.forward()
             # call registered data handler

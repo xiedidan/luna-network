@@ -74,6 +74,7 @@ class Scanner(object):
                     data["steps"] = np.array([z, y, x])
                     data["seriesuid"] = seriesuid
                     data["image"] = crop
+                    data["finishFlag"] = False
 
                     self.dataQueue.put(data)
                     if self.dataQueue.qsize() < 1:
@@ -85,3 +86,7 @@ class Scanner(object):
         print(self.fileList)
         for file in enumerate(tqdm(self.fileList)):
             self.scanSingleFile(os.path.basename(file[1]))
+
+        # done - send finishFlag
+        data = {}
+        data["finishFlag"] = True

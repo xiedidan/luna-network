@@ -29,14 +29,14 @@ class Notate(object):
         self.sqrt3 = sqrt(3.0)
 
     # helper
-    def calcWorldCoord(self, notations, origin):
-        position = np.array([notations[0], notations[1], notations[2]]) # z, y, x
+    def calcWorldCoord(self, notation, origin):
+        position = np.array([notation[0], notation[1], notation[2]]) # z, y, x
         worldCoord = origin + position
 
-        notations[0] = worldCoord[0]
-        notations[1] = worldCoord[1]
-        notations[2] = worldCoord[2]
-        return notations
+        notation[0] = worldCoord[0]
+        notation[1] = worldCoord[1]
+        notation[2] = worldCoord[2]
+        return notation
 
     def calcRadius(self, blob):
         # blob is 4D ndarray for 3D image
@@ -45,7 +45,46 @@ class Notate(object):
 
         return notation
 
+    def calcOffset(self, notation, steps):
+        position = np.array([notation[0], notation[1], notation[2]])
+        offset = steps * self.stepSize
+        position = position + offset
+
+        notation[0] = position[0]
+        notation[1] = position[1]
+        notation[2] = position[2]
+        return notation
+
     # interface
+    def notateProcess(self, notateQueue):
+        while True:
+            # get crop from queue
+            crop = notateQueue.get()
+
+            if crop["finishFlag"] == False:
+                # blobs detection
+                image = exposure.equalize_hist(crop["image"])
+                blobs = blobs_detection.blob_dog(image, threshold=0.3)
+
+                # get radius of blobs - now we have notation
+                notations = np.zeros(blobs.shape)
+                for i in range(len(blobs)):
+                    notations[i] = self.calcRadius(blobs[i])
+
+                # get world coords
+                steps = crop["steps"]
+                metaFilename = crop["seriesuid"] + ".npy"
+                meta = self.serializer.readFromNpy("meta/", metaFilename)
+                worldCoord = meta["worldOrigin"]
+                for i in range(len(notations)):
+                    notations[i] = self.calcOffset(notations[i], steps)
+                    notations[i] = self.calcWorldCoord(notations[i], worldCoord)
+
+                # write to disk
+                self.serializer.writeToNpy("notates/", "{0}-{1}".format(crop["seriesuid"], crop["number"]), notations)
+            else:
+                break
+
     def notate(self):
         csvPath = self.dataPath + self.phaseSubPath + "vnet-csv/"
         if not os.path.isdir(csvPath):

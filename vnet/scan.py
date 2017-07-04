@@ -6,6 +6,7 @@ sys.path.append("../luna-data-pre-processing")
 import os
 from glob import glob
 import numpy as np
+import SimpleITK as sitk
 from tqdm import tqdm
 
 from NoduleCropper import NoduleCropper
@@ -54,9 +55,16 @@ class Scanner(object):
         steps = np.rint(np.ceil(shape / self.stepSize))
         steps = np.array(steps, dtype = int)
 
+        # read raw image and get origin
+        mhdFile = os.path.join(self.dataPath, self.phaseSubPath, "raw/", seriesuid + ".mhd")
+        rawImage = sitk.ReadImage(mhdFile)
+        worldOrigin = np.array(rawImage.GetOrigin())[::-1]
+
         meta = {}
         meta["steps"] = steps
         meta["shape"] = shape
+        meta["worldOrigin"] = worldOrigin
+
         # print("scanSingleFile seriesuid: {0}, shape: {1}, steps: {2}".format(seriesuid, shape, steps))
         self.serializer.writeToNpy("meta/", seriesuid + ".npy", meta)
 
@@ -83,7 +91,7 @@ class Scanner(object):
     # interface
     def scanAllFiles(self):
         self.fileList = glob(self.dataPath + self.phaseSubPath + "resamples/*.npy")
-        print(self.fileList)
+        # print(self.fileList)
         for file in enumerate(tqdm(self.fileList)):
             self.scanSingleFile(os.path.basename(file[1]))
 

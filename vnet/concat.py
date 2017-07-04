@@ -38,6 +38,21 @@ class Concat(object):
         crop[:, :, :] = image[0:shape[0], 0:shape[1], 0:shape[2]]
         return np.rint(crop.astype(np.float32) / 2.)
 
+    def concatSingleFileCrop(self, seriesuid, steps, shape, ratio = 2):
+        ratio = 2
+        images = []
+        cropLength = ((steps[0] / ratio + 1) * self.stepSize, (steps[1] / ratio + 1) * self.stepSize, (steps[2] / ratio + 1) * self.stepSize)
+        for i in range(ratio * ratio * ratio):
+            image = np.zeros(cropLength)
+            images.append(image)
+
+        for zBlock in range(ratio):
+            for yBlock in range(ratio):
+                for xBlock in range(ratio):
+                    blockStepRange = np.array([])
+                    blockStepOffset = np.array([zBlock * (steps[0] / ratio), yBlock * (steps[1] / ratio), xBlock * (steps[2] / ratio)])
+
+
     # interface
     def concatAllFile(self):
         # read file list from nodules/

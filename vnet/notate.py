@@ -45,14 +45,15 @@ class Notate(object):
 
         return notation
 
-    def calcOffset(self, notation, steps):
-        position = np.array([notation[0], notation[1], notation[2]])
-        offset = steps * self.stepSize
-        position = position + offset
+    def calcOffset(self, notation, position, steps):
+        ratio = 2
+        point = np.array([notation[0], notation[1], notation[2]])
+        offset = (steps * self.stepSize / ratio) * position
+        point = point + offset
 
-        notation[0] = position[0]
-        notation[1] = position[1]
-        notation[2] = position[2]
+        notation[0] = point[0]
+        notation[1] = point[1]
+        notation[2] = point[2]
         return notation
 
     # interface
@@ -67,17 +68,27 @@ class Notate(object):
                 blobs = blobs_detection.blob_dog(image, threshold=0.3)
 
                 # get radius of blobs - now we have notation
-                notations = np.zeros(blobs.shape)
+                notationList = np.zeros(blobs.shape)
                 for i in range(len(blobs)):
-                    notations[i] = self.calcRadius(blobs[i])
+                    notationList[i] = self.calcRadius(blobs[i])
+
+                # get prob - now we have notation
+                notations = []
+                for i in range(len(notationList)):
+                    prob = crop["image"][notationList[i][0], notationList[i][1], notationList[i][2]] / 2
+                    notation = np.array([notationList[i][0], notationList[i][1], notationList[i][2], notationList[i][3], prob])
+                    notations.append(notation)
 
                 # get world coords
-                steps = crop["steps"]
+                position = crop["position"]
                 metaFilename = crop["seriesuid"] + ".npy"
+
                 meta = self.serializer.readFromNpy("meta/", metaFilename)
                 worldCoord = meta["worldOrigin"]
+                steps = meta["steps"]
+
                 for i in range(len(notations)):
-                    notations[i] = self.calcOffset(notations[i], steps)
+                    notations[i] = self.calcOffset(notations[i], position, steps)
                     notations[i] = self.calcWorldCoord(notations[i], worldCoord)
 
                 # write to disk

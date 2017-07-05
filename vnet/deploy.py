@@ -17,10 +17,18 @@ def dataScanner(dataPath, phase, dataQueue):
     scanner = Scanner(dataPath, phase, dataQueue)
     scanner.scanAllFiles()
 
+def resultWriter(serializer, resultQueue):
+    while True:
+        result = resultQueue.get()
+        if result["finishFlag"] == True:
+            break
+        else:
+            serializer.writeToNpy("results/", "{0}-{1}.npy".format(result["seriesuid"], result["number"]), result["image"])
+
 def dataHandler(input, output, parameter):
-    serializer = parameter["serializer"]
+    # serializer = parameter["serializer"]
     batchSize = parameter["batchSize"]
-    notateQueue = parameter["notateQueue"]
+    resultQueue = parameter["resultQueue"]
 
     labels = output["result"]
     # labels = np.squeeze(labels)
@@ -28,8 +36,9 @@ def dataHandler(input, output, parameter):
         data = input[i]
 
         label = labels[i]
-        out = label[1] - label[0]
+        out = label[1]
         out[out < 0] = 0.
+        out[out > 1] = 1.
 
         #out = np.rint(out).astype(dtype=np.int8)
 
@@ -42,8 +51,7 @@ def dataHandler(input, output, parameter):
 
         crop["image"] = out
 
-        # put crop into queue
-        notateQueue.put(crop)
+        resultQueue.put(crop)
 
         # serializer.writeToNpy("results/", "{0}-{1}.npy".format(data["seriesuid"], data["number"]), out)
 
@@ -52,9 +60,8 @@ if __name__ == "__main__":
     netPath = "v1/"
     phase = "deploy"
     snapshot = "_iter_20000.caffemodel"
-    queueSize = 32
+    queueSize = 512
     batchSize = 1
-    notateProcessCount = 8
 
     # start data reader
     dataQueue = multiprocessing.Queue(queueSize)
@@ -63,27 +70,20 @@ if __name__ == "__main__":
     scanProcess.daemon = True
     scanProcess.start()
 
-    # start notate processes
-    notater = Notate(dataPath)
-    notateQueue = multiprocessing.Queue(queueSize)
+    # start result writer
+    serializer = NoduleSerializer(dataPath, phase)
+    resultQueue = multiprocessing.Queue(queueSize)
 
-    notateProcessList = []
-    for i in range(notateProcessCount):
-        notateProcess = multiprocessing.Process(target = notater.notateProcess, args = (notateQueue, ))
-        notateProcess.daemon = True
-        notateProcess.start()
-        notateProcessList.append(notateProcess)
+    writerProcess = multiprocessing.Process(target = resultWriter, args = (serializer, resultQueue))
+    writerProcess.daemon = True
+    writerProcess.start()
 
     # start prophet
-    serializer = NoduleSerializer(dataPath, "test")
     dataHandlerParameter = {}
-    dataHandlerParameter["serializer"] = serializer
+    # dataHandlerParameter["serializer"] = serializer
     dataHandlerParameter["batchSize"] = batchSize
-    dataHandlerParameter["notateQueue"] = notateQueue
+    dataHandlerParameter["resultQueue"] = resultQueue
 
     prophet = Prophet(dataPath, netPath, batchSize = batchSize, snapshot = snapshot, dataQueue = dataQueue, dataHandler = dataHandler, dataHandlerParameter = dataHandlerParameter)
     prophet.speak()
 
-    # wait data in queue to be processed to exit
-    while notateQueue.qsize() > 0:
-        time.sleep(1)

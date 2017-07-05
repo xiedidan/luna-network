@@ -39,6 +39,8 @@ class Scanner(object):
     def normalize(self, image):
         mean = np.mean(image)
         std = np.std(image)
+        if std < 0.0001:
+            std = np.array([0.0001])
 
         image = image.astype(np.float32)
         image -= mean.astype(np.float32)

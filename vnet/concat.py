@@ -38,20 +38,37 @@ class Concat(object):
         crop[:, :, :] = image[0:shape[0], 0:shape[1], 0:shape[2]]
         return np.rint(crop.astype(np.float32) / 2.)
 
-    def concatSingleFileCrop(self, seriesuid, steps, shape, ratio = 2):
+    def concatSingleFileCrop(self, seriesuid, steps):
         ratio = 2
-        images = []
         cropLength = ((steps[0] / ratio + 1) * self.stepSize, (steps[1] / ratio + 1) * self.stepSize, (steps[2] / ratio + 1) * self.stepSize)
-        for i in range(ratio * ratio * ratio):
-            image = np.zeros(cropLength)
-            images.append(image)
 
         for zBlock in range(ratio):
             for yBlock in range(ratio):
                 for xBlock in range(ratio):
-                    blockStepRange = np.array([])
-                    blockStepOffset = np.array([zBlock * (steps[0] / ratio), yBlock * (steps[1] / ratio), xBlock * (steps[2] / ratio)])
+                    image = np.zeros(cropLength)
 
+                    stepRangeZ = np.array(
+                        [zBlock * (steps[0] / ratio) - zBlock, (zBlock + 1) * (steps[0] / ratio) + (1 - zBlock)])
+                    stepRangeY = np.array(
+                        [yBlock * (steps[1] / ratio) - yBlock, (yBlock + 1) * (steps[1] / ratio) + (1 - yBlock)])
+                    stepRangeX = np.array(
+                        [xBlock * (steps[2] / ratio) - xBlock, (xBlock + 1) * (steps[2] / ratio) + (1 - xBlock)])
+
+                    for z in range(stepRangeZ):
+                        for y in range(stepRangeY):
+                            for x in range(stepRangeX):
+                                number = z * steps[2] * steps[1] + y * steps[2] + x
+                                result = self.serializer.readFromNpy("results/", "{0}-{1}.npy".format(seriesuid, number))
+                                result = result.astype(np.float32)
+                                blockOffset = np.array([(z - zBlock * (steps[0] / ratio)) * self.stepSize, (y - yBlock * (steps[1] / ratio)) * self.stepSize, (x - xBlock * (steps[2] / ratio)) * self.stepSize])
+                                image[blockOffset[0]:(blockOffset[0] + self.volSize), blockOffset[1]:(blockOffset[1]+ self.volSize), blockOffset[2]:(blockOffset[2] + self.volSize)] += result[:, :, :]
+
+                    # write to disk
+                    series = zBlock * ratio * ratio + yBlock * ratio + xBlock
+                    crop = {}
+                    crop["position"] = np.array([zBlock, yBlock, xBlock])
+                    crop["image"] = image
+                    self.serializer.writeToNpy("concat/", "{0}-{1}.npy".format(seriesuid, series), crop)
 
     # interface
     def concatAllFile(self):
@@ -71,5 +88,5 @@ class Concat(object):
             self.serializer.writeToNpy("concat/", "{0}.npy".format(seriesuid), image.astype(np.int8))
 
 if __name__ == "__main__":
-    concator = Concat("d:/project/tianchi/data/", "test")
+    concator = Concat("d:/project/tianchi/data/", "deploy")
     concator.concatAllFile()

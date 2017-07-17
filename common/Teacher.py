@@ -2,6 +2,7 @@
 
 import sys
 sys.path.append("../luna-data-pre-processing")
+from Plotter import Plotter
 
 import caffe
 
@@ -60,6 +61,18 @@ class Teacher(object):
             solver.restore(self.netPath + self.snapshotPath + self.snapshotFilename)
         baseIter = solver.iter
 
+        plotter = Plotter()
+        plotter.initLossAndAccu(baseIter, self.iterationCount, self.netPath)
+
+        for i in range(self.iterationCount - baseIter):
+            solver.step(1)
+
+            loss = solver.net.blobs["loss"].data
+            accu = solver.test_nets[0].blobs["accu"].data
+
+            plotter.plotLossAndAccu(loss, accu)
+
+        '''''''''
         dataQueue = multiprocessing.Queue(4096)
         drawProc = multiprocessing.Process(target=self.drawProcess, args=(baseIter, dataQueue))
         drawProc.daemon = True
@@ -72,3 +85,4 @@ class Teacher(object):
             accu = solver.test_nets[0].blobs["accu"].data
             dataQueue.put(tuple((loss, accu)))
             # print("dataQueue.length: {0}".format(dataQueue.qsize()))
+        '''

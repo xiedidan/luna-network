@@ -71,4 +71,4 @@ class Teacher(object):
             loss = solver.net.blobs["loss"].data
             accu = solver.test_nets[0].blobs["accu"].data
             dataQueue.put(tuple((loss, accu)))
-            print("dataQueue.length: {0}".format(dataQueue.qsize()))
+            # print("dataQueue.length: {0}".format(dataQueue.qsize()))

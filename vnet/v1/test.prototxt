@@ -33,57 +33,28 @@ layer {
 # Create 16 channel data for residual function
 
 layer {
-  name: "split_input"
-  type: "Split"
+  name: "conv_input_split"
+  type: "Convolution"
   bottom: "data"
-  top: "split_input_1"
-  top: "split_input_2"
-  top: "split_input_3"
-  top: "split_input_4"
-  top: "split_input_5"
-  top: "split_input_6"
-  top: "split_input_7"
-  top: "split_input_8"
-  top: "split_input_9"
-  top: "split_input_10"
-  top: "split_input_11"
-  top: "split_input_12"
-  top: "split_input_13"
-  top: "split_input_14"
-  top: "split_input_15"
-  top: "split_input_16"
-}
-
-# Concat into channel
-
-layer {
-  name: "concat_input"
-  type: "Concat"
-  bottom: "split_input_1"
-  bottom: "split_input_2"
-  bottom: "split_input_3"
-  bottom: "split_input_4"
-  bottom: "split_input_5"
-  bottom: "split_input_6"
-  bottom: "split_input_7"
-  bottom: "split_input_8"
-  bottom: "split_input_9"
-  bottom: "split_input_10"
-  bottom: "split_input_11"
-  bottom: "split_input_12"
-  bottom: "split_input_13"
-  bottom: "split_input_14"
-  bottom: "split_input_15"
-  bottom: "split_input_16"
-  top: "concat_input"
-  concat_param { axis: 1 }
+  top: "conv_input_split"
+  param { lr_mult: 0.0 decay_mult: 0.0 }
+  param { lr_mult: 0.0 decay_mult: 0.0 }
+  convolution_param {
+    engine: CUDNN
+    num_output: 16
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler { type: "constant" value: 1.0 }
+    bias_filler { type: "constant" value: 0.0 }
+  }
 }
 
 layer {
   name: "add_input"
   type: "Eltwise"
   bottom: "conv_i64c16o64_input"
-  bottom: "concat_input"
+  bottom: "conv_input_split"
   top: "add_input"
   eltwise_param { operation: SUM }
 }

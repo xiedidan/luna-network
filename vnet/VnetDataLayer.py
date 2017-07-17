@@ -4,6 +4,7 @@ import sys
 sys.path.append("../luna-data-pre-processing")
 import NoduleCropper
 import NoduleSerializer
+import plot
 
 import os
 from glob import glob
@@ -29,7 +30,8 @@ class VnetDataLayer(caffe.Layer):
         self.batch_loader = BatchLoader(params)
 
         top[0].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
-        top[1].reshape(self.batch_size, 1, int(round(self.vol_size / 2)), int(round(self.vol_size / 2)), int(round(self.vol_size / 2)))
+        # top[1].reshape(self.batch_size, 1, int(round(self.vol_size / 2)), int(round(self.vol_size / 2)), int(round(self.vol_size / 2)))
+        top[1].reshape(self.batch_size, 1, self.vol_size, self.vol_size, self.vol_size)
 
     def forward(self, bottom, top):
         for i in range(self.batch_size):
@@ -152,7 +154,12 @@ class BatchLoader(object):
 
         crop = {}
         crop["image"] = image[zRange[0]:zRange[1], yRange[0]:yRange[1], xRange[0]:xRange[1]]
-        crop["groundTruth"] = groundTruth[(zRange[0] + 16):(zRange[1] - 16), (yRange[0] + 16):(yRange[1] - 16), (xRange[0] + 16):(xRange[1] - 16)]
+        # crop["groundTruth"] = groundTruth[(zRange[0] + 16):(zRange[1] - 16), (yRange[0] + 16):(yRange[1] - 16), (xRange[0] + 16):(xRange[1] - 16)]
+        crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1],xRange[0]:xRange[1]]
+
+        # visually check data augment
+        # plot.plotVnetCrop2D(crop, 32 - shiftz)
+
         return crop
 
     def dataProcessor(self, dataQueue):
@@ -184,12 +191,15 @@ class BatchLoader(object):
                     crop = self.randomizedCrop(sample, self.rotateRatio, self.shiftRatio)
                     crop = self.randomizedHistogramShift(crop, self.histogramShiftRatio)
                 elif self.phase == "test":
-                    groundTruth = sample["groundTruth"]
-                    labelRange = np.array([int(round(self.volSize / 4)), int(round(self.volSize * 3 / 4))])
-                    crop["groundTruth"] = groundTruth[labelRange[0]:labelRange[1], labelRange[0]:labelRange[1], labelRange[0]:labelRange[1]]
+                    # groundTruth = sample["groundTruth"]
+                    # labelRange = np.array([int(round(self.volSize / 4)), int(round(self.volSize * 3 / 4))])
+                    # crop["groundTruth"] = groundTruth[labelRange[0]:labelRange[1], labelRange[0]:labelRange[1], labelRange[0]:labelRange[1]]
+                    crop["groundTruth"] = sample["groundTruth"]
                     crop["image"] = sample["image"]
 
-                if crop["groundTruth"].shape[0] != 32:
-                    print("{0}, {1}, {2}, {3}, {4}".format(self.phase, noduleIndex, labelRange, crop["image"].shape, crop["groundTruth"].shape))
+                if crop["groundTruth"].shape[0] != 64:
+                    # print("{0}, {1}, {2}, {3}, {4}".format(self.phase, noduleIndex, labelRange, crop["image"].shape, crop["groundTruth"].shape))
+                    print("{0}, {1}, {2}, {3}".format(self.phase, noduleIndex, crop["image"].shape,
+                                                           crop["groundTruth"].shape))
                 else:
                     dataQueue.put(tuple((crop["image"], crop["groundTruth"])))

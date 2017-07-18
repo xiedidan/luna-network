@@ -4,7 +4,7 @@ import sys
 sys.path.append("../luna-data-pre-processing")
 import NoduleCropper
 import NoduleSerializer
-import plot
+from Plotter import Plotter
 
 import os
 from glob import glob
@@ -62,6 +62,9 @@ class BatchLoader(object):
         self.phaseSubPath = self.phase + "/"
 
         self.dataQueue = multiprocessing.Queue(self.queueSize)
+
+        self.plotter = Plotter()
+        self.plotter.initDataAndLabel2D(interval = 20)
 
         if self.phase == "deploy":
             # scan
@@ -158,11 +161,12 @@ class BatchLoader(object):
         crop["groundTruth"] = groundTruth[zRange[0]:zRange[1], yRange[0]:yRange[1],xRange[0]:xRange[1]]
 
         # visually check data augment
-        # plot.plotVnetCrop2D(crop, 32 - shiftz)
+        self.plotter.plotDataAndLabel2D(crop["image"], crop["groundTruth"], 32 - shiftz)
 
         return crop
 
     def dataProcessor(self, dataQueue):
+        plotter = Plotter()
         npyFileList = glob(self.dataPath + self.phaseSubPath + "nodules/*.npy")
         npyFileList = map(lambda filePath: os.path.basename(filePath), npyFileList)
 
@@ -196,6 +200,9 @@ class BatchLoader(object):
                     # crop["groundTruth"] = groundTruth[labelRange[0]:labelRange[1], labelRange[0]:labelRange[1], labelRange[0]:labelRange[1]]
                     crop["groundTruth"] = sample["groundTruth"]
                     crop["image"] = sample["image"]
+
+                    # visually check data
+                    self.plotter.plotDataAndLabel2D(crop["image"], crop["groundTruth"], 32)
 
                 if crop["groundTruth"].shape[0] != 64:
                     # print("{0}, {1}, {2}, {3}, {4}".format(self.phase, noduleIndex, labelRange, crop["image"].shape, crop["groundTruth"].shape))

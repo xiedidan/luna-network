@@ -142,6 +142,9 @@ class BatchLoader(object):
             groundTruth = np.transpose(groundTruth, rotate)
 
         dataRange = np.array([32, 96])
+        shiftx = 0
+        shifty = 0
+        shiftz = 0
         if np.random.random() < shiftRatio:
             # shift - we shift +-16 max along each axis
             shiftx = np.random.randint(-16, 16)

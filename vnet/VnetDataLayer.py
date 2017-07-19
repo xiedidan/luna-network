@@ -169,7 +169,6 @@ class BatchLoader(object):
         return crop
 
     def dataProcessor(self, dataQueue):
-        plotter = Plotter()
         npyFileList = glob(self.dataPath + self.phaseSubPath + "nodules/*.npy")
         npyFileList = map(lambda filePath: os.path.basename(filePath), npyFileList)
 

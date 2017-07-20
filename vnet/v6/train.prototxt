@@ -54,13 +54,13 @@ layer {
   name: "bn_input"
   type: "BatchNorm"
   bottom: "conv_i64c16o64_input"
-  top: "bn_i64c16o64_input"
+  top: "conv_i64c16o64_input"
 }
 
 layer {
   name: "add_input"
   type: "Eltwise"
-  bottom: "bn_i64c16o64_input"
+  bottom: "conv_i64c16o64_input"
   bottom: "conv_input_split"
   top: "add_input"
   eltwise_param { operation: SUM }
@@ -95,14 +95,14 @@ layer {
   name: "bn_pooling_i64c32o32_input"
   type: "BatchNorm"
   bottom: "conv_pooling_i64c32o32_input"
-  top: "bn_pooling_i64c32o32_input"
+  top: "conv_pooling_i64c32o32_input"
 }
 
 layer {
   name: "relu_pooling_i64c32o32_input"
   type: "PReLU"
-  bottom: "bn_pooling_i64c32o32_input"
-  top: "relu_pooling_i64c32o32_input"
+  bottom: "conv_pooling_i64c32o32_input"
+  top: "conv_pooling_i64c32o32_input"
 }
 
 # left block 1 - 2 stage conv
@@ -110,7 +110,7 @@ layer {
 layer {
   name: "conv_i32c32o32_left1_1"
   type: "Convolution"
-  bottom: "relu_pooling_i64c32o32_input"
+  bottom: "conv_pooling_i64c32o32_input"
   top: "conv_i32c32o32_left1_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -129,20 +129,20 @@ layer {
   name: "bn_i32c32o32_left1_1"
   type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_1"
-  top: "bn_i32c32o32_left1_1"
+  top: "conv_i32c32o32_left1_1"
 }
 
 layer {
   name: "relu_i32c32o32_left1_1"
   type: "PReLU"
-  bottom: "bn_i32c32o32_left1_1"
-  top: "relu_i32c32o32_left1_1"
+  bottom: "conv_i32c32o32_left1_1"
+  top: "conv_i32c32o32_left1_1"
 }
 
 layer {
   name: "conv_i32c32o32_left1_2"
   type: "Convolution"
-  bottom: "relu_i32c32o32_left1_1"
+  bottom: "conv_i32c32o32_left1_1"
   top: "conv_i32c32o32_left1_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -161,13 +161,13 @@ layer {
   name: "bn_i32c32o32_left1_2"
   type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_2"
-  top: "bn_i32c32o32_left1_2"
+  top: "conv_i32c32o32_left1_2"
 }
 
 layer {
   name: "add_left_1"
   type: "Eltwise"
-  bottom: "bn_i32c32o32_left1_2"
+  bottom: "conv_i32c32o32_left1_2"
   bottom: "relu_pooling_i64c32o32_input"
   top: "add_left_1"
   eltwise_param { operation: SUM }
@@ -202,14 +202,14 @@ layer {
   name: "bn_pooling_i32c64o16_left1"
   type: "BatchNorm"
   bottom: "conv_pooling_i32c64o16_left1"
-  top: "bn_pooling_i32c64o16_left1"
+  top: "conv_pooling_i32c64o16_left1"
 }
 
 layer {
   name: "relu_pooling_i32c64o16_left1"
   type: "PReLU"
-  bottom: "bn_pooling_i32c64o16_left1"
-  top: "relu_pooling_i32c64o16_left1"
+  bottom: "conv_pooling_i32c64o16_left1"
+  top: "conv_pooling_i32c64o16_left1"
 }
 
 # left block 2 - 3 stage conv
@@ -217,7 +217,7 @@ layer {
 layer {
   name: "conv_i16c64o16_left2_1"
   type: "Convolution"
-  bottom: "relu_pooling_i32c64o16_left1"
+  bottom: "conv_pooling_i32c64o16_left1"
   top: "conv_i16c64o16_left2_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -236,20 +236,20 @@ layer {
   name: "bn_i16c64o16_left2_1"
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_1"
-  top: "bn_i16c64o16_left2_1"
+  top: "conv_i16c64o16_left2_1"
 }
 
 layer {
   name: "relu_i16c64o16_left2_1"
   type: "PReLU"
-  bottom: "bn_i16c64o16_left2_1"
-  top: "relu_i16c64o16_left2_1"
+  bottom: "conv_i16c64o16_left2_1"
+  top: "conv_i16c64o16_left2_1"
 }
 
 layer {
   name: "conv_i16c64o16_left2_2"
   type: "Convolution"
-  bottom: "relu_i16c64o16_left2_1"
+  bottom: "conv_i16c64o16_left2_1"
   top: "conv_i16c64o16_left2_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -268,20 +268,20 @@ layer {
   name: "bn_i16c64o16_left2_2"
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_2"
-  top: "bn_i16c64o16_left2_2"
+  top: "conv_i16c64o16_left2_2"
 }
 
 layer {
   name: "relu_i16c64o16_left2_2"
   type: "PReLU"
-  bottom: "bn_i16c64o16_left2_2"
-  top: "relu_i16c64o16_left2_2"
+  bottom: "conv_i16c64o16_left2_2"
+  top: "conv_i16c64o16_left2_2"
 }
 
 layer {
   name: "conv_i16c64o16_left2_3"
   type: "Convolution"
-  bottom: "relu_i16c64o16_left2_2"
+  bottom: "conv_i16c64o16_left2_2"
   top: "conv_i16c64o16_left2_3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -300,13 +300,13 @@ layer {
   name: "bn_i16c64o16_left2_3"
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_3"
-  top: "bn_i16c64o16_left2_3"
+  top: "conv_i16c64o16_left2_3"
 }
 
 layer {
   name: "add_left_2"
   type: "Eltwise"
-  bottom: "bn_i16c64o16_left2_3"
+  bottom: "conv_i16c64o16_left2_3"
   bottom: "relu_pooling_i32c64o16_left1"
   top: "add_left_2"
   eltwise_param { operation: SUM }
@@ -341,14 +341,14 @@ layer {
   name: "bn_pooling_i16c128o8_left2"
   type: "BatchNorm"
   bottom: "conv_pooling_i16c128o8_left2"
-  top: "bn_pooling_i16c128o8_left2"
+  top: "conv_pooling_i16c128o8_left2"
 }
 
 layer {
   name: "relu_pooling_i16c128o8_left2"
   type: "PReLU"
-  bottom: "bn_pooling_i16c128o8_left2"
-  top: "relu_pooling_i16c128o8_left2"
+  bottom: "conv_pooling_i16c128o8_left2"
+  top: "conv_pooling_i16c128o8_left2"
 }
 
 # left block 3 - 3 stage conv
@@ -356,7 +356,7 @@ layer {
 layer {
   name: "conv_i8c128o8_left3_1"
   type: "Convolution"
-  bottom: "relu_pooling_i16c128o8_left2"
+  bottom: "conv_pooling_i16c128o8_left2"
   top: "conv_i8c128o8_left3_1"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -375,20 +375,20 @@ layer {
   name: "bn_i8c128o8_left3_1"
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_1"
-  top: "bn_i8c128o8_left3_1"
+  top: "conv_i8c128o8_left3_1"
 }
 
 layer {
   name: "relu_i8c128o8_left3_1"
   type: "PReLU"
-  bottom: "bn_i8c128o8_left3_1"
-  top: "relu_i8c128o8_left3_1"
+  bottom: "conv_i8c128o8_left3_1"
+  top: "conv_i8c128o8_left3_1"
 }
 
 layer {
   name: "conv_i8c128o8_left3_2"
   type: "Convolution"
-  bottom: "relu_i8c128o8_left3_1"
+  bottom: "conv_i8c128o8_left3_1"
   top: "conv_i8c128o8_left3_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -407,20 +407,20 @@ layer {
   name: "bn_i8c128o8_left3_2"
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_2"
-  top: "bn_i8c128o8_left3_2"
+  top: "conv_i8c128o8_left3_2"
 }
 
 layer {
   name: "relu_i8c128o8_left3_2"
   type: "PReLU"
-  bottom: "bn_i8c128o8_left3_2"
-  top: "relu_i8c128o8_left3_2"
+  bottom: "conv_i8c128o8_left3_2"
+  top: "conv_i8c128o8_left3_2"
 }
 
 layer {
   name: "conv_i8c128o8_left3_3"
   type: "Convolution"
-  bottom: "relu_i8c128o8_left3_2"
+  bottom: "conv_i8c128o8_left3_2"
   top: "conv_i8c128o8_left3_3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -439,13 +439,13 @@ layer {
   name: "bn_i8c128o8_left3_3"
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_3"
-  top: "bn_i8c128o8_left3_3"
+  top: "conv_i8c128o8_left3_3"
 }
 
 layer {
   name: "add_left_3"
   type: "Eltwise"
-  bottom: "bn_i8c128o8_left3_3"
+  bottom: "conv_i8c128o8_left3_3"
   bottom: "relu_pooling_i16c128o8_left2"
   top: "add_left_3"
   eltwise_param { operation: SUM }
@@ -480,14 +480,14 @@ layer {
   name: "bn_depooling_i8c64o16_left3"
   type: "BatchNorm"
   bottom: "depooling_i8c64o16_left3"
-  top: "bn_depooling_i8c64o16_left3"
+  top: "depooling_i8c64o16_left3"
 }
 
 layer {
   name: "relu_i8c64o16_left3"
   type: "PReLU"
-  bottom: "bn_depooling_i8c64o16_left3"
-  top: "relu_i8c64o16_left3"
+  bottom: "depooling_i8c64o16_left3"
+  top: "depooling_i8c64o16_left3"
 }
 
 # Right block 1 - 3 stage conv
@@ -495,7 +495,7 @@ layer {
 layer {
   name: "concat_right1"
   type: "Concat"
-  bottom: "relu_i8c64o16_left3"
+  bottom: "depooling_i8c64o16_left3"
   bottom: "add_left_2"
   top: "concat_right1"
   concat_param { axis: 1 }
@@ -523,20 +523,20 @@ layer {
   name: "bn_i16c128o16_right1_1"
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_1"
-  top: "bn_i16c128o16_right1_1"
+  top: "conv_i16c128o16_right1_1"
 }
 
 layer {
   name: "relu_i16c128o16_right1_1"
   type: "PReLU"
-  bottom: "bn_i16c128o16_right1_1"
-  top: "relu_i16c128o16_right1_1"
+  bottom: "conv_i16c128o16_right1_1"
+  top: "conv_i16c128o16_right1_1"
 }
 
 layer {
   name: "conv_i16c128o16_right1_2"
   type: "Convolution"
-  bottom: "relu_i16c128o16_right1_1"
+  bottom: "conv_i16c128o16_right1_1"
   top: "conv_i16c128o16_right1_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -555,20 +555,20 @@ layer {
   name: "bn_i16c128o16_right1_2"
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_2"
-  top: "bn_i16c128o16_right1_2"
+  top: "conv_i16c128o16_right1_2"
 }
 
 layer {
   name: "relu_i16c128o16_right1_2"
   type: "PReLU"
-  bottom: "bn_i16c128o16_right1_2"
-  top: "relu_i16c128o16_right1_2"
+  bottom: "conv_i16c128o16_right1_2"
+  top: "conv_i16c128o16_right1_2"
 }
 
 layer {
   name: "conv_i16c128o16_right1_3"
   type: "Convolution"
-  bottom: "relu_i16c128o16_right1_2"
+  bottom: "conv_i16c128o16_right1_2"
   top: "conv_i16c128o16_right1_3"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -587,13 +587,13 @@ layer {
   name: "bn_i16c128o16_right1_3"
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_3"
-  top: "bn_i16c128o16_right1_3"
+  top: "conv_i16c128o16_right1_3"
 }
 
 layer {
   name: "add_right_1"
   type: "Eltwise"
-  bottom: "bn_i16c128o16_right1_3"
+  bottom: "conv_i16c128o16_right1_3"
   bottom: "concat_right1"
   top: "add_right_1"
   eltwise_param { operation: SUM }
@@ -628,13 +628,13 @@ layer {
   name: "bn_depooling_i16c32o32_right1"
   type: "BatchNorm"
   bottom: "depooling_i16c32o32_right1"
-  top: "bn_depooling_i16c32o32_right1"
+  top: "depooling_i16c32o32_right1"
 }
 
 layer {
   name: "relu_i16c32o32_right1"
   type: "PReLU"
-  bottom: "bn_depooling_i16c32o32_right1"
+  bottom: "depooling_i16c32o32_right1"
   top: "relu_i16c32o32_right1"
 }
 
@@ -671,20 +671,20 @@ layer {
   name: "bn_i32c64o32_right2_1"
   type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_1"
-  top: "bn_i32c64o32_right2_1"
+  top: "conv_i32c64o32_right2_1"
 }
 
 layer {
   name: "relu_i32c64o32_right2_1"
   type: "PReLU"
-  bottom: "bn_i32c64o32_right2_1"
-  top: "relu_i32c64o32_right2_1"
+  bottom: "conv_i32c64o32_right2_1"
+  top: "conv_i32c64o32_right2_1"
 }
 
 layer {
   name: "conv_i32c64o32_right2_2"
   type: "Convolution"
-  bottom: "relu_i32c64o32_right2_1"
+  bottom: "conv_i32c64o32_right2_1"
   top: "conv_i32c64o32_right2_2"
   param { lr_mult: 1.0 decay_mult: 1.0 }
   param { lr_mult: 2.0 decay_mult: 0.0 }
@@ -703,13 +703,13 @@ layer {
   name: "bn_i32c64o32_right2_2"
   type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_2"
-  top: "bn_i32c64o32_right2_2"
+  top: "conv_i32c64o32_right2_2"
 }
 
 layer {
   name: "add_right_2"
   type: "Eltwise"
-  bottom: "bn_i32c64o32_right2_2"
+  bottom: "conv_i32c64o32_right2_2"
   bottom: "concat_right2"
   top: "add_right_2"
   eltwise_param { operation: SUM }
@@ -744,13 +744,13 @@ layer {
   name: "bn_depooling_i32c16o64_right2"
   type: "BatchNorm"
   bottom: "depooling_i32c16o64_right2"
-  top: "bn_depooling_i32c16o64_right2"
+  top: "depooling_i32c16o64_right2"
 }
 
 layer {
   name: "relu_i32c16o64_right2"
   type: "PReLU"
-  bottom: "bn_depooling_i32c16o64_right2"
+  bottom: "depooling_i32c16o64_right2"
   top: "relu_i32c16o64_right2"
 }
 
@@ -787,13 +787,13 @@ layer {
   name: "bn_i64c32o64_output_1"
   type: "BatchNorm"
   bottom: "conv_i64c32o64_output_1"
-  top: "bn_i64c32o64_output_1"
+  top: "conv_i64c32o64_output_1"
 }
 
 layer {
   name: "add_output"
   type: "Eltwise"
-  bottom: "bn_i64c32o64_output_1"
+  bottom: "conv_i64c32o64_output_1"
   bottom: "concat_output"
   top: "add_output"
   eltwise_param { operation: SUM }

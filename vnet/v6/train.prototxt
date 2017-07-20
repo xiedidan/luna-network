@@ -51,16 +51,16 @@ layer {
 }
 
 layer {
-  name: "mvn_input"
-  type: "MVN"
+  name: "bn_input"
+  type: "BatchNorm"
   bottom: "conv_i64c16o64_input"
-  top: "mvn_i64c16o64_input"
+  top: "bn_i64c16o64_input"
 }
 
 layer {
   name: "add_input"
   type: "Eltwise"
-  bottom: "mvn_i64c16o64_input"
+  bottom: "bn_i64c16o64_input"
   bottom: "conv_input_split"
   top: "add_input"
   eltwise_param { operation: SUM }
@@ -92,16 +92,16 @@ layer {
 }
 
 layer {
-  name: "mvn_pooling_i64c32o32_input"
-  type: "MVN"
+  name: "bn_pooling_i64c32o32_input"
+  type: "BatchNorm"
   bottom: "conv_pooling_i64c32o32_input"
-  top: "mvn_pooling_i64c32o32_input"
+  top: "bn_pooling_i64c32o32_input"
 }
 
 layer {
   name: "relu_pooling_i64c32o32_input"
   type: "PReLU"
-  bottom: "mvn_pooling_i64c32o32_input"
+  bottom: "bn_pooling_i64c32o32_input"
   top: "relu_pooling_i64c32o32_input"
 }
 
@@ -126,16 +126,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i32c32o32_left1_1"
-  type: "MVN"
+  name: "bn_i32c32o32_left1_1"
+  type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_1"
-  top: "mvn_i32c32o32_left1_1"
+  top: "bn_i32c32o32_left1_1"
 }
 
 layer {
   name: "relu_i32c32o32_left1_1"
   type: "PReLU"
-  bottom: "mvn_i32c32o32_left1_1"
+  bottom: "bn_i32c32o32_left1_1"
   top: "relu_i32c32o32_left1_1"
 }
 
@@ -158,16 +158,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i32c32o32_left1_2"
-  type: "MVN"
+  name: "bn_i32c32o32_left1_2"
+  type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_2"
-  top: "mvn_i32c32o32_left1_2"
+  top: "bn_i32c32o32_left1_2"
 }
 
 layer {
   name: "add_left_1"
   type: "Eltwise"
-  bottom: "mvn_i32c32o32_left1_2"
+  bottom: "bn_i32c32o32_left1_2"
   bottom: "relu_pooling_i64c32o32_input"
   top: "add_left_1"
   eltwise_param { operation: SUM }
@@ -199,16 +199,16 @@ layer {
 }
 
 layer {
-  name: "mvn_pooling_i32c64o16_left1"
-  type: "MVN"
+  name: "bn_pooling_i32c64o16_left1"
+  type: "BatchNorm"
   bottom: "conv_pooling_i32c64o16_left1"
-  top: "mvn_pooling_i32c64o16_left1"
+  top: "bn_pooling_i32c64o16_left1"
 }
 
 layer {
   name: "relu_pooling_i32c64o16_left1"
   type: "PReLU"
-  bottom: "mvn_pooling_i32c64o16_left1"
+  bottom: "bn_pooling_i32c64o16_left1"
   top: "relu_pooling_i32c64o16_left1"
 }
 
@@ -233,16 +233,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c64o16_left2_1"
-  type: "MVN"
+  name: "bn_i16c64o16_left2_1"
+  type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_1"
-  top: "mvn_i16c64o16_left2_1"
+  top: "bn_i16c64o16_left2_1"
 }
 
 layer {
   name: "relu_i16c64o16_left2_1"
   type: "PReLU"
-  bottom: "mvn_i16c64o16_left2_1"
+  bottom: "bn_i16c64o16_left2_1"
   top: "relu_i16c64o16_left2_1"
 }
 
@@ -265,16 +265,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c64o16_left2_2"
-  type: "MVN"
+  name: "bn_i16c64o16_left2_2"
+  type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_2"
-  top: "mvn_i16c64o16_left2_2"
+  top: "bn_i16c64o16_left2_2"
 }
 
 layer {
   name: "relu_i16c64o16_left2_2"
   type: "PReLU"
-  bottom: "mvn_i16c64o16_left2_2"
+  bottom: "bn_i16c64o16_left2_2"
   top: "relu_i16c64o16_left2_2"
 }
 
@@ -297,16 +297,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c64o16_left2_3"
-  type: "MVN"
+  name: "bn_i16c64o16_left2_3"
+  type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_3"
-  top: "mvn_i16c64o16_left2_3"
+  top: "bn_i16c64o16_left2_3"
 }
 
 layer {
   name: "add_left_2"
   type: "Eltwise"
-  bottom: "mvn_i16c64o16_left2_3"
+  bottom: "bn_i16c64o16_left2_3"
   bottom: "relu_pooling_i32c64o16_left1"
   top: "add_left_2"
   eltwise_param { operation: SUM }
@@ -338,16 +338,16 @@ layer {
 }
 
 layer {
-  name: "mvn_pooling_i16c128o8_left2"
-  type: "MVN"
+  name: "bn_pooling_i16c128o8_left2"
+  type: "BatchNorm"
   bottom: "conv_pooling_i16c128o8_left2"
-  top: "mvn_pooling_i16c128o8_left2"
+  top: "bn_pooling_i16c128o8_left2"
 }
 
 layer {
   name: "relu_pooling_i16c128o8_left2"
   type: "PReLU"
-  bottom: "mvn_pooling_i16c128o8_left2"
+  bottom: "bn_pooling_i16c128o8_left2"
   top: "relu_pooling_i16c128o8_left2"
 }
 
@@ -372,16 +372,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i8c128o8_left3_1"
-  type: "MVN"
+  name: "bn_i8c128o8_left3_1"
+  type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_1"
-  top: "mvn_i8c128o8_left3_1"
+  top: "bn_i8c128o8_left3_1"
 }
 
 layer {
   name: "relu_i8c128o8_left3_1"
   type: "PReLU"
-  bottom: "mvn_i8c128o8_left3_1"
+  bottom: "bn_i8c128o8_left3_1"
   top: "relu_i8c128o8_left3_1"
 }
 
@@ -404,16 +404,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i8c128o8_left3_2"
-  type: "MVN"
+  name: "bn_i8c128o8_left3_2"
+  type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_2"
-  top: "mvn_i8c128o8_left3_2"
+  top: "bn_i8c128o8_left3_2"
 }
 
 layer {
   name: "relu_i8c128o8_left3_2"
   type: "PReLU"
-  bottom: "mvn_i8c128o8_left3_2"
+  bottom: "bn_i8c128o8_left3_2"
   top: "relu_i8c128o8_left3_2"
 }
 
@@ -436,16 +436,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i8c128o8_left3_3"
-  type: "MVN"
+  name: "bn_i8c128o8_left3_3"
+  type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_3"
-  top: "mvn_i8c128o8_left3_3"
+  top: "bn_i8c128o8_left3_3"
 }
 
 layer {
   name: "add_left_3"
   type: "Eltwise"
-  bottom: "mvn_i8c128o8_left3_3"
+  bottom: "bn_i8c128o8_left3_3"
   bottom: "relu_pooling_i16c128o8_left2"
   top: "add_left_3"
   eltwise_param { operation: SUM }
@@ -477,16 +477,16 @@ layer {
 }
 
 layer {
-  name: "mvn_depooling_i8c64o16_left3"
-  type: "MVN"
+  name: "bn_depooling_i8c64o16_left3"
+  type: "BatchNorm"
   bottom: "depooling_i8c64o16_left3"
-  top: "mvn_depooling_i8c64o16_left3"
+  top: "bn_depooling_i8c64o16_left3"
 }
 
 layer {
   name: "relu_i8c64o16_left3"
   type: "PReLU"
-  bottom: "mvn_depooling_i8c64o16_left3"
+  bottom: "bn_depooling_i8c64o16_left3"
   top: "relu_i8c64o16_left3"
 }
 
@@ -520,16 +520,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c128o16_right1_1"
-  type: "MVN"
+  name: "bn_i16c128o16_right1_1"
+  type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_1"
-  top: "mvn_i16c128o16_right1_1"
+  top: "bn_i16c128o16_right1_1"
 }
 
 layer {
   name: "relu_i16c128o16_right1_1"
   type: "PReLU"
-  bottom: "mvn_i16c128o16_right1_1"
+  bottom: "bn_i16c128o16_right1_1"
   top: "relu_i16c128o16_right1_1"
 }
 
@@ -552,16 +552,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c128o16_right1_2"
-  type: "MVN"
+  name: "bn_i16c128o16_right1_2"
+  type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_2"
-  top: "mvn_i16c128o16_right1_2"
+  top: "bn_i16c128o16_right1_2"
 }
 
 layer {
   name: "relu_i16c128o16_right1_2"
   type: "PReLU"
-  bottom: "mvn_i16c128o16_right1_2"
+  bottom: "bn_i16c128o16_right1_2"
   top: "relu_i16c128o16_right1_2"
 }
 
@@ -584,16 +584,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i16c128o16_right1_3"
-  type: "MVN"
+  name: "bn_i16c128o16_right1_3"
+  type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_3"
-  top: "mvn_i16c128o16_right1_3"
+  top: "bn_i16c128o16_right1_3"
 }
 
 layer {
   name: "add_right_1"
   type: "Eltwise"
-  bottom: "mvn_i16c128o16_right1_3"
+  bottom: "bn_i16c128o16_right1_3"
   bottom: "concat_right1"
   top: "add_right_1"
   eltwise_param { operation: SUM }
@@ -625,16 +625,16 @@ layer {
 }
 
 layer {
-  name: "mvn_depooling_i16c32o32_right1"
-  type: "MVN"
+  name: "bn_depooling_i16c32o32_right1"
+  type: "BatchNorm"
   bottom: "depooling_i16c32o32_right1"
-  top: "mvn_depooling_i16c32o32_right1"
+  top: "bn_depooling_i16c32o32_right1"
 }
 
 layer {
   name: "relu_i16c32o32_right1"
   type: "PReLU"
-  bottom: "mvn_depooling_i16c32o32_right1"
+  bottom: "bn_depooling_i16c32o32_right1"
   top: "relu_i16c32o32_right1"
 }
 
@@ -668,16 +668,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i32c64o32_right2_1"
-  type: "MVN"
+  name: "bn_i32c64o32_right2_1"
+  type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_1"
-  top: "mvn_i32c64o32_right2_1"
+  top: "bn_i32c64o32_right2_1"
 }
 
 layer {
   name: "relu_i32c64o32_right2_1"
   type: "PReLU"
-  bottom: "mvn_i32c64o32_right2_1"
+  bottom: "bn_i32c64o32_right2_1"
   top: "relu_i32c64o32_right2_1"
 }
 
@@ -700,16 +700,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i32c64o32_right2_2"
-  type: "MVN"
+  name: "bn_i32c64o32_right2_2"
+  type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_2"
-  top: "mvn_i32c64o32_right2_2"
+  top: "bn_i32c64o32_right2_2"
 }
 
 layer {
   name: "add_right_2"
   type: "Eltwise"
-  bottom: "mvn_i32c64o32_right2_2"
+  bottom: "bn_i32c64o32_right2_2"
   bottom: "concat_right2"
   top: "add_right_2"
   eltwise_param { operation: SUM }
@@ -741,16 +741,16 @@ layer {
 }
 
 layer {
-  name: "mvn_depooling_i32c16o64_right2"
-  type: "MVN"
+  name: "bn_depooling_i32c16o64_right2"
+  type: "BatchNorm"
   bottom: "depooling_i32c16o64_right2"
-  top: "mvn_depooling_i32c16o64_right2"
+  top: "bn_depooling_i32c16o64_right2"
 }
 
 layer {
   name: "relu_i32c16o64_right2"
   type: "PReLU"
-  bottom: "mvn_depooling_i32c16o64_right2"
+  bottom: "bn_depooling_i32c16o64_right2"
   top: "relu_i32c16o64_right2"
 }
 
@@ -784,16 +784,16 @@ layer {
 }
 
 layer {
-  name: "mvn_i64c32o64_output_1"
-  type: "MVN"
+  name: "bn_i64c32o64_output_1"
+  type: "BatchNorm"
   bottom: "conv_i64c32o64_output_1"
-  top: "mvn_i64c32o64_output_1"
+  top: "bn_i64c32o64_output_1"
 }
 
 layer {
   name: "add_output"
   type: "Eltwise"
-  bottom: "mvn_i64c32o64_output_1"
+  bottom: "bn_i64c32o64_output_1"
   bottom: "concat_output"
   top: "add_output"
   eltwise_param { operation: SUM }

@@ -1,0 +1,14 @@
+net: "v1/train.prototxt"
+snapshot_prefix: "v1/snapshot/"
+base_lr: 0.00002
+momentum: 0.9
+weight_decay: 0.0005
+lr_policy: "step"
+stepsize: 5000
+gamma: 0.7
+display: 10
+snapshot: 500
+test_initialization: false
+test_interval: 500
+test_iter: 5
+test_net: "v1/test.prototxt"

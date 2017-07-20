@@ -39,7 +39,7 @@ class Teacher(object):
 
         plotter = Plotter()
         plotter.initLossAndAccu(baseIter, self.iterationCount, self.netPath)
-        plotter.initResult(interval = 10)
+        plotter.initResult(interval = 120)
 
         for i in range(self.iterationCount - baseIter):
             solver.step(1)
@@ -50,8 +50,13 @@ class Teacher(object):
             plotter.plotLossAndAccu(loss, accu)
 
             # plot result and label
+            data = solver.net.blobs["data"].data
+            data = np.squeeze(data[0, 0, :, :, :])
+
             result = solver.net.blobs["conv_i64c2o64_output_1"].data
             result = np.squeeze(result[0, 1, :, :, :])
+
             label = solver.net.blobs["label"].data
-            label = np.squeeze(label[0, 1, :, :, :])
-            plotter.plotResult(result, label)
+            label = np.squeeze(label[0, 0, :, :, :])
+
+            plotter.plotResult(data, label, result)

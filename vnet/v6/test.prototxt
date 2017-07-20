@@ -168,7 +168,7 @@ layer {
   name: "add_left_1"
   type: "Eltwise"
   bottom: "conv_i32c32o32_left1_2"
-  bottom: "relu_pooling_i64c32o32_input"
+  bottom: "conv_pooling_i64c32o32_input"
   top: "add_left_1"
   eltwise_param { operation: SUM }
 }
@@ -307,7 +307,7 @@ layer {
   name: "add_left_2"
   type: "Eltwise"
   bottom: "conv_i16c64o16_left2_3"
-  bottom: "relu_pooling_i32c64o16_left1"
+  bottom: "conv_pooling_i32c64o16_left1"
   top: "add_left_2"
   eltwise_param { operation: SUM }
 }
@@ -446,7 +446,7 @@ layer {
   name: "add_left_3"
   type: "Eltwise"
   bottom: "conv_i8c128o8_left3_3"
-  bottom: "relu_pooling_i16c128o8_left2"
+  bottom: "conv_pooling_i16c128o8_left2"
   top: "add_left_3"
   eltwise_param { operation: SUM }
 }

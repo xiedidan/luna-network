@@ -55,6 +55,7 @@ class Teacher(object):
 
             result = solver.net.blobs["conv_i64c2o64_output_1"].data
             result = np.squeeze(result[0, 1, :, :, :])
+            # print(result)
 
             label = solver.net.blobs["label"].data
             label = np.squeeze(label[0, 0, :, :, :])

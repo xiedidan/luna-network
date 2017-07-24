@@ -55,6 +55,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i64c16o64_input"
   top: "conv_i64c16o64_input"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -96,6 +99,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_pooling_i64c32o32_input"
   top: "conv_pooling_i64c32o32_input"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -130,6 +136,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_1"
   top: "conv_i32c32o32_left1_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -162,6 +171,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i32c32o32_left1_2"
   top: "conv_i32c32o32_left1_2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -203,6 +215,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_pooling_i32c64o16_left1"
   top: "conv_pooling_i32c64o16_left1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -237,6 +252,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_1"
   top: "conv_i16c64o16_left2_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -269,6 +287,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_2"
   top: "conv_i16c64o16_left2_2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -301,6 +322,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c64o16_left2_3"
   top: "conv_i16c64o16_left2_3"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -342,6 +366,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_pooling_i16c128o8_left2"
   top: "conv_pooling_i16c128o8_left2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -376,6 +403,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_1"
   top: "conv_i8c128o8_left3_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -408,6 +438,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_2"
   top: "conv_i8c128o8_left3_2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -440,6 +473,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i8c128o8_left3_3"
   top: "conv_i8c128o8_left3_3"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -481,6 +517,9 @@ layer {
   type: "BatchNorm"
   bottom: "depooling_i8c64o16_left3"
   top: "depooling_i8c64o16_left3"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -524,6 +563,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_1"
   top: "conv_i16c128o16_right1_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -556,6 +598,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_2"
   top: "conv_i16c128o16_right1_2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -588,6 +633,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i16c128o16_right1_3"
   top: "conv_i16c128o16_right1_3"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -629,6 +677,9 @@ layer {
   type: "BatchNorm"
   bottom: "depooling_i16c32o32_right1"
   top: "depooling_i16c32o32_right1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -672,6 +723,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_1"
   top: "conv_i32c64o32_right2_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -704,6 +758,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i32c64o32_right2_2"
   top: "conv_i32c64o32_right2_2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -745,6 +802,9 @@ layer {
   type: "BatchNorm"
   bottom: "depooling_i32c16o64_right2"
   top: "depooling_i32c16o64_right2"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {
@@ -788,6 +848,9 @@ layer {
   type: "BatchNorm"
   bottom: "conv_i64c32o64_output_1"
   top: "conv_i64c32o64_output_1"
+  batch_norm_param {
+    use_global_stats: true
+  }
 }
 
 layer {

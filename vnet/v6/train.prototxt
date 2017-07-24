@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "VnetDataLayer"
     layer: "VnetDataLayer"
-    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.9, \'queue_size\': 30, \'phase\': \'train\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.9, \'histogram_shift_ratio\': 0.5, \'net_path\': \'v6/\', \'batch_size\': 2}"
+    param_str: "{\'vol_size\': 64, \'iter_count\': 100000, \'rotate_ratio\': 0.7, \'queue_size\': 30, \'phase\': \'train\', \'data_path\': \'d:/project/tianchi/data/\', \'shift_ratio\': 0.7, \'histogram_shift_ratio\': 0.3, \'net_path\': \'v6/\', \'batch_size\': 2}"
   }
 }
 

@@ -39,7 +39,7 @@ class Teacher(object):
 
         plotter = Plotter()
         plotter.initLossAndAccu(baseIter, self.iterationCount, self.netPath)
-        plotter.initResult(interval = 120)
+        plotter.initResult(interval = 50)
 
         for i in range(self.iterationCount - baseIter):
             solver.step(1)

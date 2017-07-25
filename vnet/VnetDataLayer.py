@@ -86,7 +86,7 @@ class BatchLoader(object):
 
         sample = {}
         image = serializer.readFromNpy("nodules/", filename)
-        groundTruth = serializer.readFromNpy("groundTruths/", filename)
+        groundTruth = serializer.readFromNpy("labels/", filename)
         sample["image"] = image
         sample["groundTruth"] = groundTruth
 
